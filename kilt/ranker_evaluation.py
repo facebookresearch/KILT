@@ -7,7 +7,7 @@ from tqdm import tqdm
 import os
 
 from kilt import kilt_utils as utils
-from kilt import evaluation_metrics
+from kilt import eval_retrieval
 
 
 def run(test_config_json, ranker, model_name, logger, topk=100, debug=False):
@@ -117,15 +117,15 @@ def run(test_config_json, ranker, model_name, logger, topk=100, debug=False):
                     element = validated_data[query_id]
 
                     if doc_names and len(doc_names) > 0:
-                        local_p1 = evaluation_metrics.precision_at_1(element, doc_names)
-                        local_Rprec = evaluation_metrics.rprecision(element, doc_names)
+                        local_p1 = eval_retrieval.precision_at_1(element, doc_names)
+                        local_Rprec = eval_retrieval.rprecision(element, doc_names)
 
                         global_p1 += local_p1
                         global_Rprec += local_Rprec
 
                         if doc_names and len(doc_names) >= topk:
 
-                            local_MAP = evaluation_metrics.meanAvgPrecision(
+                            local_MAP = eval_retrieval.meanAvgPrecision(
                                 element, doc_names, topk
                             )
 

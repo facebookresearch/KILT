@@ -5,8 +5,7 @@
     "open domain QA": {
         "Natural Questions": "/checkpoint/fabiopetroni/KILT/datasets/nq-test-kilt.jsonl",
         "HotpotQA": "/checkpoint/fabiopetroni/KILT/datasets/hotpotqa-test-kilt.jsonl",
-        "TriviaQA": "/checkpoint/fabiopetroni/KILT/datasets/triviaqa-test-kilt.jsonl",
-        "ELI5": "/checkpoint/fabiopetroni/KILT/datasets/eli5-test-kilt.jsonl"
+        "TriviaQA": "/checkpoint/fabiopetroni/KILT/datasets/triviaqa-test-kilt.jsonl"
     },
     "relation extraction": {
         "Zero Shot RE": "/checkpoint/fabiopetroni/KILT/datasets/zeroshot-test-kilt.jsonl"
