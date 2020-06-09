@@ -1,6 +1,6 @@
 # KILT: a benchmark for Knowledge Intensive Language Tasks
 
-Main document https://fb.quip.com/AgxuAqUrKOuA
+<img align="middle" src="img/KILT.jpg" height="256" alt="KILT">
 
 ### setup the env
 
