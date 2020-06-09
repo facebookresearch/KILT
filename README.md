@@ -16,6 +16,7 @@ Setup retrievers following [this README](kilt/retrievers/README.md)
 
 run the evaluation
 ```bash
+export PYTHONPATH=.
 python scripts/evaluate_ranking.py -m {dpr/kilt/drqa}
 ```
 

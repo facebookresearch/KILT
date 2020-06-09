@@ -13,10 +13,10 @@ loader = np.load(filename, allow_pickle=True)
 
 # DPR
 ```bash
-pip install -e git+git@github.com:fairinternal/DPR.git#egg=DPR
+pip install -e git+git@github.com:facebookresearch/DPR.git#egg=DPR
 ```
 
-change line 168 of `src/dpr/dense_retriever.py` to
+change line 185 of `src/dpr/dense_retriever.py` to
 
 ```python
 try:
