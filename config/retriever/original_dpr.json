@@ -1,0 +1,20 @@
+{
+    "model_file": "/checkpoint/fabiopetroni/KILT/retriever/DPR/multiset_biencoder_hf_bert_base.cp",
+    "encoded_ctx_file": "/checkpoint/fabiopetroni/KILT/retriever/DPR/wiki_rep_nq_webq_trec_comb3/*",
+    "encoder_model_type": null,
+    "pretrained_model_cfg": null,
+    "projection_dim": 0,
+    "device": "cuda",
+    "n_gpu": 2,
+    "local_rank": -1,
+    "fp16": false,
+    "index_buffer": 50000,
+    "hnsw_index": false,
+    "batch_size": 32,
+    "qa_file": "/private/home/fabiopetroni/DPR/data/retriever/qas/nq-dev.csv",
+    "out_file": "output/info.log",
+    "n_docs": 1000,
+    "ctx_file": "/checkpoint/fabiopetroni/KILT/retriever/DPR/psgs_w100.tsv",
+    "KILT_mapping": "/checkpoint/fabiopetroni/KILT/retriever/DPR/mapping_original_DPR_KILT.p",
+    "hnsw_index_path": null
+}

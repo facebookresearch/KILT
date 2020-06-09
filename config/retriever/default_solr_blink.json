@@ -1,0 +1,8 @@
+{
+    "solr_address": "http://localhost:8983/solr/wikipedia",
+    "fl": "* score",
+    "rows": 100,
+    "defType": "edismax",
+    "bf": "log(sum(num_incoming_links,1))",
+    "num_threads": 32
+}

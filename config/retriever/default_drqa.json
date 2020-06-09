@@ -1,0 +1,4 @@
+{
+    "retriever_model": "/checkpoint/fabiopetroni/KILT/retriever/kilt_db_simple.npz",
+    "num_threads": 4
+}

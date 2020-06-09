@@ -1,0 +1,22 @@
+{
+    "fact checking": {
+        "FEVER": "/checkpoint/fabiopetroni/KILT/datasets/fever-test-kilt.jsonl"
+    },
+    "open domain QA": {
+        "Natural Questions": "/checkpoint/fabiopetroni/KILT/datasets/nq-test-kilt.jsonl",
+        "HotpotQA": "/checkpoint/fabiopetroni/KILT/datasets/hotpotqa-test-kilt.jsonl",
+        "TriviaQA": "/checkpoint/fabiopetroni/KILT/datasets/triviaqa-test-kilt.jsonl",
+        "ELI5": "/checkpoint/fabiopetroni/KILT/datasets/eli5-test-kilt.jsonl"
+    },
+    "relation extraction": {
+        "Zero Shot RE": "/checkpoint/fabiopetroni/KILT/datasets/zeroshot-test-kilt.jsonl"
+    },
+    "entity linking": {
+        "AIDA-YAGO2": "/checkpoint/fabiopetroni/KILT/datasets/aidayago2-test-kilt.jsonl",
+        "WNED": "/checkpoint/fabiopetroni/KILT/datasets/wned-test-kilt.jsonl",
+        "CWEB": "/checkpoint/fabiopetroni/KILT/datasets/cweb-test-kilt.jsonl"
+    },
+    "dialogue": {
+        "Wizard of Wikipedia": "/checkpoint/fabiopetroni/KILT/datasets/wow-test-kilt.jsonl"
+    }
+}

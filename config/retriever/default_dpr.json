@@ -1,0 +1,20 @@
+{
+    "model_file": "/checkpoint/fabiopetroni/KILT/retriever/DPR/dpr_multi_set_hf_bert.0",
+    "encoded_ctx_file": "/checkpoint/fabiopetroni/KILT/retriever/DPR/kilt_rep/old/kilt_passages_2048_0.pkl",
+    "encoder_model_type": null,
+    "pretrained_model_cfg": null,
+    "projection_dim": 0,
+    "device": "cuda",
+    "n_gpu": 2,
+    "local_rank": -1,
+    "fp16": false,
+    "index_buffer": 50000,
+    "hnsw_index": true,
+    "batch_size": 512,
+    "qa_file": "/private/home/fabiopetroni/DPR/data/retriever/qas/nq-dev.csv",
+    "out_file": "output/info.log",
+    "n_docs": 50,
+    "ctx_file": "/checkpoint/fabiopetroni/KILT/retriever/DPR/kilt_w100_title.tsv",
+    "KILT_mapping": "/checkpoint/fabiopetroni/KILT/retriever/DPR/mapping_KILT_title.p",
+    "hnsw_index_path": "/checkpoint/fabiopetroni/KILT/retriever/DPR/kilt_hnsw"
+}

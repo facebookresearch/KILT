@@ -1,0 +1,7 @@
+spacy
+bs4
+matplotlib
+nltk
+pymongo
+pytest
+jsonlines

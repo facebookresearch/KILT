@@ -1,0 +1,14 @@
+{
+    "test_entities": null,
+    "test_mentions": null,
+    "interactive": false,
+    "biencoder_model": "/checkpoint/fabiopetroni/KILT/retriever/BLINK/biencoder_wiki_large.bin",
+    "biencoder_config": "/checkpoint/fabiopetroni/KILT/retriever/BLINK/biencoder_wiki_large.json",
+    "entity_catalogue": "/checkpoint/fabiopetroni/KILT/retriever/BLINK/entity.jsonl",
+    "entity_encoding": "/checkpoint/fabiopetroni/KILT/retriever/BLINK/all_entities_large.t7",
+    "crossencoder_model": "/checkpoint/fabiopetroni/KILT/retriever/BLINK/crossencoder_wiki_large.bin",
+    "crossencoder_config": "/checkpoint/fabiopetroni/KILT/retriever/BLINK/crossencoder_wiki_large.json",
+    "fast": false,
+    "output_path": "logs/",
+    "top_k": 100
+}
