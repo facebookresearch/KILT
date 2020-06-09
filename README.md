@@ -1,4 +1,4 @@
-# KILT: a benchmark for Knowledge Intensive Language Tasks
+# Library for Knowledge Intensive Language Tasks
 
 <img align="middle" src="img/KILT.jpg" height="256" alt="KILT">
 
