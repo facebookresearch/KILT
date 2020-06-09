@@ -46,29 +46,4 @@ ks.get_num_pages()
 page = ks.get_page_by_id(27097632)
 
 # get pages by title
-pages = ks.get_pages_by_title("Michael Jordan")
-
-# get page by url
-url = "https://en.wikipedia.org/wiki/Tara_Chand_(Indian_politician)"
-page = ks.get_page_from_url(url)
-```
-
-### Matching utilities
-
-```python
-import kilt.utils as utils
-import spacy
-nlp = spacy.load("en_core_web_sm")
-
-# match an *answer* inside a wikipedia *page*
-paragraph_id, start_character, end_character, bleu = utils.match_answer(answer, page, nlp = nlp)
-
-print("match: '{}'".format(page["text"][paragraph_id][start_character:end_character]))
-```
-
-
-## Adding a dataset
-Please build as new dataset as a subclass of the `Dataset` interface (`see kilt/datasets/base_dataset.py`).
-This will require implementing 2 functions:
-- `get_chunks` - which will return a list of chunks of datapoints of the dataset (this function should encapsulate reading the dataset from a file splitting into chunks)
-- `process_chunk` - which will return a list of mapped datapoints from a given chunk and optionally metadata.
+page = ks.get_page_by_title("Michael Jordan")
