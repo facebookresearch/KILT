@@ -10,7 +10,23 @@ from kilt import kilt_utils as utils
 from kilt import eval_retrieval
 
 
-def run(test_config_json, ranker, model_name, logger, topk=100, debug=False):
+def generate_output_file(output_folder, output_name, model_name, dataset_file):
+    basename = os.path.basename(dataset_file)
+    output_file = os.path.join(output_folder, output_name, model_name, basename)
+    if not os.path.exists(os.path.dirname(output_file)):
+        os.makedirs(os.path.dirname(output_file))
+    return output_file
+
+
+def run(
+    test_config_json,
+    ranker,
+    model_name,
+    logger,
+    topk=100,
+    debug=False,
+    output_folder="",
+):
 
     if debug:
         pp = pprint.PrettyPrinter(indent=4)
@@ -57,10 +73,13 @@ def run(test_config_json, ranker, model_name, logger, topk=100, debug=False):
 
                 # write retrieved augmented data - for dpr, blink, drqa
                 if meta:
-                    basename = os.path.basename(dataset_file)
-                    output_file = "/checkpoint/fabiopetroni/KILT/retrieved_augmented_datasets/{}/{}".format(
-                        model_name, basename
+                    output_file = generate_output_file(
+                        output_folder,
+                        "retrieved_augmented_datasets",
+                        model_name,
+                        dataset_file,
                     )
+
                     print(
                         "writing retrieved augmented output in {}".format(output_file),
                         flush=True,
@@ -77,10 +96,10 @@ def run(test_config_json, ranker, model_name, logger, topk=100, debug=False):
 
                 # write predictions files for BLINK
                 if False and model_name == "blink" and meta:
-                    basename = os.path.basename(dataset_file)
-                    output_file = "/checkpoint/fabiopetroni/KILT/predictions/BLINK/{}".format(
-                        basename
+                    output_file = generate_output_file(
+                        output_folder, "predictions", model_name, dataset_file
                     )
+
                     print(
                         "writing predictions in {}".format(output_file), flush=True,
                     )

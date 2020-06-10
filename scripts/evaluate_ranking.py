@@ -6,10 +6,14 @@ from kilt import kilt_utils as utils
 from kilt.retrievers import DrQA_tfidf, Solr_BM25, DPR_connector, BLINK_connector
 
 
-def execute(logger, test_config_json, retriever, log_directory, model_name):
+def execute(
+    logger, test_config_json, retriever, log_directory, model_name, output_folder
+):
 
     # run evaluation
-    result = ranker_evaluation.run(test_config_json, retriever, model_name, logger)
+    result = ranker_evaluation.run(
+        test_config_json, retriever, model_name, logger, output_folder=output_folder
+    )
 
     # dump results on json file
     with open("{}/{}_result.json".format(log_directory, model_name), "w") as outfile:
@@ -62,7 +66,14 @@ def main(args):
         else:
             retriever = BLINK_connector.BLINK.from_default_config(args.model_name)
 
-    execute(logger, test_config_json, retriever, log_directory, args.model_name)
+    execute(
+        logger,
+        test_config_json,
+        retriever,
+        log_directory,
+        args.model_name,
+        args.output_folder,
+    )
 
 
 if __name__ == "__main__":
@@ -97,6 +108,15 @@ if __name__ == "__main__":
         type=str,
         default=None,
         help="model configuration",
+    )
+
+    parser.add_argument(
+        "--output_folder",
+        "-o",
+        dest="output_folder",
+        type=str,
+        default="",
+        help="output folder",
     )
 
     args = parser.parse_args()
