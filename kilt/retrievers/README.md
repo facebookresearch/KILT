@@ -28,5 +28,5 @@ except:
 
 # BLINK
 ```bash
-pip install -e git+git@github.com:fairinternal/BLINK-Internal.git#egg=BLINK
+pip install -e git+git@github.com:facebookresearch/BLINK.git#egg=BLINK
 ```
