@@ -4,14 +4,12 @@ import sys
 import argparse
 import pickle
 import json
-
+import os
 import spacy
 from tqdm import tqdm, trange
 
 import kilt.kilt_utils as utils
 from kilt.knowledge_source import KnowledgeSource
-
-CHUNK_SIZE = 100
 
 
 def create_chunk(document, buffer, paragraph_id, paragraph, section):
@@ -55,6 +53,7 @@ def run_thread(args):
     nlp = args["nlp"]
     id = args["id"]
     rank = args["rank"]
+    chunk_size = args["chunk_size"]
 
     if id == 0 and rank == 0:
         iter_ = tqdm(documents)
@@ -79,7 +78,7 @@ def run_thread(args):
                 continue
 
             for sentence in paragraph.sents:
-                if buffer and len(buffer) + len(sentence) >= CHUNK_SIZE:
+                if buffer and len(buffer) + len(sentence) >= chunk_size:
                     # create new chunk
                     new_chunk = create_chunk(
                         document, buffer, paragraph_id, paragraph, section
@@ -103,7 +102,7 @@ def run_thread(args):
                     output
                     and document["wikipedia_id"] == output[-1]["wikipedia_id"]
                     and section == output[-1]["section"]
-                    and len(buffer) + output[-1]["tmp_len"] < CHUNK_SIZE
+                    and len(buffer) + output[-1]["tmp_len"] < chunk_size
                 ):
 
                     # adjusting anchors offsets
@@ -122,22 +121,18 @@ def run_thread(args):
 
     for out in output:
         del out["tmp_len"]
-            
+
     return output
 
 
-def store_chunks(documents, num_threads):
+def store_chunks(documents, num_threads, folder):
     for id, chunk in enumerate(utils.chunk_it(documents, num_threads)):
-        out_filename = "/checkpoint/fabiopetroni/DPR_KILT_nicola/KILT_psgs_DPR/documents_{}.p".format(
-            id
-        )
+        out_filename = os.path.join(folder, "documents_{}.p".format(id))
         pickle.dump(chunk, open(out_filename, "wb"))
 
 
-def load_chunk(id):
-    in_filename = "/checkpoint/fabiopetroni/DPR_KILT_nicola/KILT_psgs_DPR/documents_{}.p".format(
-        id
-    )
+def load_chunk(id, folder):
+    in_filename = os.path.join(folder, "documents_{}.p".format(id))
     return pickle.load(open(in_filename, "rb"))
 
 
@@ -153,8 +148,8 @@ def load_all_documents_from_ks(cursor, steps, n):
     return documents
 
 
-def preprocess_data(num_threads):
-    
+def preprocess_data(num_threads, folder):
+
     ks = KnowledgeSource()
     n = ks.get_num_pages()
     steps = int(n / 100)
@@ -163,10 +158,10 @@ def preprocess_data(num_threads):
 
     print("LOADING ALL DOCUMENTS", flush=True)
     ducuments = load_all_documents_from_ks(cursor, steps, n)
-    store_chunks(ducuments, num_threads)
+    store_chunks(ducuments, num_threads, folder)
 
 
-def main(rank, num_threads):
+def main(rank, num_threads, folder, chunk_size):
 
     print("loading chunk {}".format(rank), flush=True)
     documents = load_chunk(rank)
@@ -177,6 +172,7 @@ def main(rank, num_threads):
             "id": id,
             "documents": chunk,
             "nlp": spacy.load("en_core_web_sm"),
+            "chunk_size": chunk_size,
         }
         for id, chunk in enumerate(utils.chunk_it(documents, num_threads))
     ]
@@ -185,12 +181,7 @@ def main(rank, num_threads):
     pool = ThreadPool(num_threads)
     results = pool.map(run_thread, arguments)
 
-    f = open(
-        "/checkpoint/fabiopetroni/DPR_KILT_nicola/KILT_psgs/kilt_psgs_w100_{}.jsonl".format(
-            rank
-        ),
-        "w+",
-    )
+    f = open(os.path.join(folder, "kilt_{}.jsonl".format(rank)), "w+",)
 
     i = 1
     for output in results:
@@ -202,17 +193,13 @@ def main(rank, num_threads):
     pool.join()
     print("done {}".format(rank))
 
-    
-def merge_files(num_threads):
 
-    f = open(
-        "/checkpoint/fabiopetroni/DPR_KILT_nicola/KILT_psgs/kilt_w100.jsonl", "w+"
-    )
+def merge_files(num_threads, folder):
+
+    f = open(os.path.join(folder, "kilt.jsonl"), "w+")
     i = 1
     for rank in trange(num_threads):
-        filename = "/checkpoint/fabiopetroni/DPR_KILT_nicola/KILT_psgs/kilt_psgs_w100_{}.jsonl".format(
-            rank
-        )
+        filename = os.path.join(folder, "kilt_{}.jsonl".format(rank))
         print("reading {}".format(filename), flush=True)
         with open(filename, "r") as fin:
             lines = fin.readlines()
@@ -224,11 +211,7 @@ def merge_files(num_threads):
                         flush=True,
                     )
                 else:
-                    f.write(
-                        "{}\t{}\n".format(
-                            i, elements[1].strip()
-                        )
-                    )
+                    f.write("{}\t{}\n".format(i, elements[1].strip()))
                     i += 1
     f.close()
     print("done")
@@ -236,6 +219,21 @@ def merge_files(num_threads):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--step",
+        type=str,
+        choices=["preprocess", "main", "merge"],
+        help="step to exectue",
+    )
+
+    parser.add_argument(
+        "--chunk_size", default=100, type=int, help="chunk max token size",
+    )
+
+    parser.add_argument(
+        "--folder", type=str, help="path where to save and load files",
+    )
 
     parser.add_argument(
         "--rank", default=None, type=int, help="rank in a distributed execution",
@@ -246,15 +244,21 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    
+
     if args.threads == None:
         args.threads = int(multiprocessing.cpu_count())
 
     # step 1
-    # preprocess_data(num_threads=args.threads)
-
+    if args.step == "preprocess":
+        preprocess_data(num_threads=args.threads, folder=args.folder)
     # step 2
-    # main(rank=args.rank, num_threads=args.threads)
-
+    elif args.step == "main":
+        main(
+            rank=args.rank,
+            num_threads=args.threads,
+            folder=args.folder,
+            chunk_size=args.chunk_size,
+        )
     # step 3
-    # merge_files(num_threads=args.threads)
+    elif args.step == "merge":
+        merge_files(num_threads=args.threads, folder=args.folder)
