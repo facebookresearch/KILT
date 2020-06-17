@@ -34,7 +34,7 @@ def recall_at_k(datapoint, predicted_page_ids, k):
 
     r = 0
     if predicted_page_ids and len(predicted_page_ids) > 0:
-        top_k = {str(e) for e in predicted_page_ids[:k]}
+        top_k = {str(e).strip() for e in predicted_page_ids[:k]}
 
         recalls = []
         for output in datapoint["output"]:
