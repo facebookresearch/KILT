@@ -29,7 +29,7 @@ def precision_at_1(datapoint, predicted_page_ids):
     return p
 
 
-def recall_at_k(datapoint, predicted_page_ids, k=1):
+def recall_at_k(datapoint, predicted_page_ids, k):
     assert k > 1, "k must be a positive integer grater than 1."
 
     r = 0
