@@ -30,7 +30,7 @@ def precision_at_1(datapoint, predicted_page_ids):
 
 
 def recall_at_k(datapoint, predicted_page_ids, k=1):
-    assert k > 1, "k must be a postivie integer grater than 1."
+    assert k > 1, "k must be a positive integer grater than 1."
 
     r = 0
     if predicted_page_ids and len(predicted_page_ids) > 0:
