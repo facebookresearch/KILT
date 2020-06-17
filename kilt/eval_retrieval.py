@@ -29,6 +29,23 @@ def precision_at_1(datapoint, predicted_page_ids):
     return p
 
 
+def recall_at_k(datapoint, predicted_page_ids, k=1):
+    assert k > 1, "k must be a postivie integer grater than 1."
+
+    r = 0
+    if predicted_page_ids and len(predicted_page_ids) > 0:
+        top_k = [str(e) for e in predicted_page_ids[:k]]
+        recalls = [
+            str(provenance["wikipedia_id"]).strip() in top_k
+            and top_k.index(str(provenance["wikipedia_id"]).strip()) < k
+            for output in datapoint["output"]
+            for provenance in output["provenance"]
+        ]
+        r = int(any(recalls))
+
+    return r
+
+
 def _computeMAP(gold_wikipedia_ids, predicted_page_ids, topk):
     # Mean Average Precision
     rate_num = 0.0
@@ -91,10 +108,11 @@ def rprecision(datapoint, predicted_page_ids):
     return max(Rprec_vector)
 
 
-def get_ranking_metrics(guess_item, gold_item):
+def get_ranking_metrics(guess_item, gold_item, ks):
 
     p1 = 0
     Rprec = 0
+    recall_at_k = {"recall@{}".format(k): 0 for k in ks}
 
     assert (
         "output" in guess_item and len(guess_item["output"]) == 1
@@ -112,14 +130,19 @@ def get_ranking_metrics(guess_item, gold_item):
     if len(guess_wikipedia_ids) > 0:
         p1 = precision_at_1(gold_item, guess_wikipedia_ids)
         Rprec = rprecision(gold_item, guess_wikipedia_ids)
+        for k in ks:
+            recall_at_k["recall@{}".format(k)] = recall_at_k(
+                datapoint, predicted_page_ids, k
+            )
 
-    return {"p1": p1, "Rprec": Rprec}
+    return {"p1": p1, "Rprec": Rprec, **recall_at_k}
 
 
-def compute(gold_dataset, guess_dataset):
+def compute(gold_dataset, guess_dataset, ks):
 
     p1 = 0.0
     Rprec = 0.0
+    recall_at_k = {"recall@{}".format(k): 0 for k in ks}
 
     assert len(guess_dataset) == len(
         gold_dataset
@@ -129,23 +152,35 @@ def compute(gold_dataset, guess_dataset):
         assert gold["id"] == guess["id"], "Items must have same order with same IDs"
 
     for guess_item, gold_item in zip(guess_dataset, gold_dataset):
-        ranking_metrics = get_ranking_metrics(guess_item, gold_item)
+        ranking_metrics = get_ranking_metrics(guess_item, gold_item, ks)
         p1 += ranking_metrics["p1"]
         Rprec += ranking_metrics["Rprec"]
+        for k in recall_at_k:
+            recall_at_k["recall@{}".format(k)] += ranking_metrics["recall@{}".format(k)]
 
     p1 /= len(guess_dataset)
     Rprec /= len(guess_dataset)
-    return {"p1": p1, "Rprec": Rprec}
+    for k in recall_at_k:
+        recall_at_k["recall@{}".format(k)] /= len(guess_dataset)
+
+    return {"p1": p1, "Rprec": Rprec, **recall_at_k}
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("guess", help="Guess KILT file")
     parser.add_argument("gold", help="Gold KILT file")
+    parser.add_argument(
+        "--ks",
+        type=str,
+        default="1,5,10,20",
+        help="Comma separated list of positive integers for recall@k",
+    )
 
     args = parser.parse_args()
+    args.ks = [int(k) for k in args.ks.split(",")]
 
     gold_dataset = kilt_utils.load_data(args.gold)
     guess_dataset = kilt_utils.load_data(args.guess)
 
-    print(compute(gold_dataset, guess_dataset))
+    print(compute(gold_dataset, guess_dataset, args.ks))
