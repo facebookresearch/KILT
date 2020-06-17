@@ -28,7 +28,7 @@ from kilt.knowledge_source import KnowledgeSource
 # get the knowledge souce
 ks = KnowledgeSource()
 
-# count entries - 5903531
+# count entries - 5903530
 ks.get_num_pages()
 
 # get page by id
