@@ -30,18 +30,21 @@ def precision_at_1(datapoint, predicted_page_ids):
 
 
 def recall_at_k(datapoint, predicted_page_ids, k=1):
-    assert k > 1, "k must be a postivie integer grater than 1."
+    assert k > 1, "k must be a positive integer grater than 1."
 
     r = 0
     if predicted_page_ids and len(predicted_page_ids) > 0:
-        top_k = [str(e) for e in predicted_page_ids[:k]]
-        recalls = [
-            str(provenance["wikipedia_id"]).strip() in top_k
-            and top_k.index(str(provenance["wikipedia_id"]).strip()) < k
-            for output in datapoint["output"]
-            for provenance in output["provenance"]
-        ]
-        r = int(any(recalls))
+        top_k = {str(e) for e in predicted_page_ids[:k]}
+
+        recalls = []
+        for output in datapoint["output"]:
+            relevant_set = {
+                str(provenance["wikipedia_id"]).strip()
+                for provenance in output["provenance"]
+            }
+            recalls.append(len(relevant_set.intersection(top_k)) / len(relevant_set))
+
+        r = max(recalls)
 
     return r
 
