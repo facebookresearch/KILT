@@ -1,0 +1,19 @@
+{
+    "fact checking": {
+        "FEVER": "/checkpoint/fabiopetroni/KILT/datasets/fever-train-kilt.jsonl"
+    },
+    "open domain QA": {
+        "Natural Questions": "/checkpoint/fabiopetroni/KILT/datasets/nq-train-kilt.jsonl",
+        "HotpotQA": "/checkpoint/fabiopetroni/KILT/datasets/hotpotqa-train-kilt.jsonl",
+        "TriviaQA": "/checkpoint/fabiopetroni/KILT/datasets/triviaqa-train-kilt.jsonl"
+    },
+    "relation extraction": {
+        "Zero Shot RE": "/checkpoint/fabiopetroni/KILT/datasets/zeroshot-train-kilt.jsonl"
+    },
+    "entity linking": {
+        "AIDA-YAGO2": "/checkpoint/fabiopetroni/KILT/datasets/aidayago2-train-kilt.jsonl"
+    },
+    "dialogue": {
+        "Wizard of Wikipedia": "/checkpoint/fabiopetroni/KILT/datasets/wow-train-kilt.jsonl"
+    }
+}
