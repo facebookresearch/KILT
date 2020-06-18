@@ -30,7 +30,7 @@ def precision_at_1(datapoint, predicted_page_ids):
 
 
 def recall_at_k(datapoint, predicted_page_ids, k):
-    assert k > 1, "k must be a positive integer grater than 1."
+    assert k > 0, "k must be a positive integer grater than 0."
 
     r = 0
     if predicted_page_ids and len(predicted_page_ids) > 0:
@@ -115,7 +115,7 @@ def get_ranking_metrics(guess_item, gold_item, ks):
 
     p1 = 0
     Rprec = 0
-    recall_at_k = {"recall@{}".format(k): 0 for k in ks}
+    R_at_k = {"recall@{}".format(k): 0 for k in ks}
 
     assert (
         "output" in guess_item and len(guess_item["output"]) == 1
@@ -134,18 +134,18 @@ def get_ranking_metrics(guess_item, gold_item, ks):
         p1 = precision_at_1(gold_item, guess_wikipedia_ids)
         Rprec = rprecision(gold_item, guess_wikipedia_ids)
         for k in ks:
-            recall_at_k["recall@{}".format(k)] = recall_at_k(
-                datapoint, predicted_page_ids, k
+            R_at_k["recall@{}".format(k)] = recall_at_k(
+                gold_item, guess_wikipedia_ids, k
             )
 
-    return {"p1": p1, "Rprec": Rprec, **recall_at_k}
+    return {"p1": p1, "Rprec": Rprec, **R_at_k}
 
 
 def compute(gold_dataset, guess_dataset, ks):
 
     p1 = 0.0
     Rprec = 0.0
-    recall_at_k = {"recall@{}".format(k): 0 for k in ks}
+    R_at_k = {"recall@{}".format(k): 0 for k in ks}
 
     assert len(guess_dataset) == len(
         gold_dataset
@@ -158,15 +158,15 @@ def compute(gold_dataset, guess_dataset, ks):
         ranking_metrics = get_ranking_metrics(guess_item, gold_item, ks)
         p1 += ranking_metrics["p1"]
         Rprec += ranking_metrics["Rprec"]
-        for k in recall_at_k:
-            recall_at_k["recall@{}".format(k)] += ranking_metrics["recall@{}".format(k)]
+        for k in ks:
+            R_at_k["recall@{}".format(k)] += ranking_metrics["recall@{}".format(k)]
 
     p1 /= len(guess_dataset)
     Rprec /= len(guess_dataset)
-    for k in recall_at_k:
-        recall_at_k["recall@{}".format(k)] /= len(guess_dataset)
+    for k in ks:
+        R_at_k["recall@{}".format(k)] /= len(guess_dataset)
 
-    return {"p1": p1, "Rprec": Rprec, **recall_at_k}
+    return {"p1": p1, "Rprec": Rprec, **R_at_k}
 
 
 if __name__ == "__main__":
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--ks",
         type=str,
-        default="1,5,10,20",
+        default="5,10,20",
         help="Comma separated list of positive integers for recall@k",
     )
 
