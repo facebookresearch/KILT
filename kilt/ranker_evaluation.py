@@ -32,7 +32,7 @@ def run(
         pp = pprint.PrettyPrinter(indent=4)
 
     table = prettytable.PrettyTable(
-        ["TASK", "DATASET", "P@1", "R-prec", "MAP", "support"]
+        ["TASK", "DATASET", "P@1", "R-prec", "R@5", "R@10", "R@20", "MAP", "support"]
     )
     result = {}
 
@@ -128,6 +128,9 @@ def run(
                 # evaluate
                 global_p1 = 0.0
                 global_Rprec = 0.0
+                global_R5 = 0.0
+                global_R10 = 0.0
+                global_R20 = 0.0
                 global_MAP = 0.0
 
                 for doc_names, doc_scores, query_id in zip(
@@ -138,9 +141,15 @@ def run(
                     if doc_names and len(doc_names) > 0:
                         local_p1 = eval_retrieval.precision_at_1(element, doc_names)
                         local_Rprec = eval_retrieval.rprecision(element, doc_names)
+                        local_R5 = eval_retrieval.recall_at_k(element, doc_names, k=5)
+                        local_R10 = eval_retrieval.recall_at_k(element, doc_names, k=10)
+                        local_R20 = eval_retrieval.recall_at_k(element, doc_names, k=20)
 
                         global_p1 += local_p1
                         global_Rprec += local_Rprec
+                        global_R5 += local_R5
+                        global_R10 += local_R10
+                        global_R20 += local_R20
 
                         if doc_names and len(doc_names) >= topk:
 
@@ -155,6 +164,9 @@ def run(
                                 print("doc_names : {}".format(doc_names))
                                 print("p1 : {}".format(local_p1))
                                 print("Rprec : {}".format(local_Rprec))
+                                print("R@5 : {}".format(local_R5))
+                                print("R@10 : {}".format(local_R10))
+                                print("R@20 : {}".format(local_R20))
                                 print("MAP : {}".format(local_MAP))
                                 input("...")
                         else:
@@ -175,10 +187,16 @@ def run(
 
                 global_p1 /= len(query_data)
                 global_Rprec /= len(query_data)
+                global_R5 /= len(query_data)
+                global_R10 /= len(query_data)
+                global_R20 /= len(query_data)
                 global_MAP /= len(query_data)
 
                 logger.info("p@1: {}%".format(round(global_p1 * 100, 2)))
                 logger.info("Rprec: {}%".format(round(global_Rprec * 100, 2)))
+                logger.info("R@5: {}%".format(round(global_R5 * 100, 2)))
+                logger.info("R@10: {}%".format(round(global_R10 * 100, 2)))
+                logger.info("R@20: {}%".format(round(global_R20 * 100, 2)))
                 logger.info("MAP: {}%".format(round(global_MAP * 100, 2)))
                 logger.info("support: {}".format(len(all_query_id)))
 
@@ -188,6 +206,9 @@ def run(
                         dataset_name,
                         round(global_p1 * 100, 2),
                         round(global_Rprec * 100, 2),
+                        round(global_R5 * 100, 2),
+                        round(global_R10 * 100, 2),
+                        round(global_R20 * 100, 2),
                         round(global_MAP * 100, 2),
                         len(all_query_id),
                     ]
@@ -196,6 +217,9 @@ def run(
                 result[dataset_name] = {
                     "p@1": global_p1,
                     "Rprec": global_Rprec,
+                    "R@5": global_R5,
+                    "R@10": global_R10,
+                    "R@20": global_R20,
                     "MAP": global_MAP,
                 }
 
