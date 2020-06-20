@@ -10,9 +10,9 @@ from kilt import kilt_utils as utils
 from kilt import eval_retrieval
 
 
-def generate_output_file(output_folder, output_name, model_name, dataset_file):
+def generate_output_file(output_folder, dataset_file):
     basename = os.path.basename(dataset_file)
-    output_file = os.path.join(output_folder, output_name, model_name, basename)
+    output_file = os.path.join(output_folder, basename)
     if not os.path.exists(os.path.dirname(output_file)):
         os.makedirs(os.path.dirname(output_file))
     return output_file
@@ -73,12 +73,7 @@ def run(
 
                 # write retrieved augmented data - for dpr, blink, drqa
                 if meta:
-                    output_file = generate_output_file(
-                        output_folder,
-                        "retrieved_augmented_datasets",
-                        model_name,
-                        dataset_file,
-                    )
+                    output_file = generate_output_file(output_folder, dataset_file)
 
                     print(
                         "writing retrieved augmented output in {}".format(output_file),
@@ -96,9 +91,7 @@ def run(
 
                 # write predictions files for BLINK
                 if False and model_name == "blink" and meta:
-                    output_file = generate_output_file(
-                        output_folder, "predictions", model_name, dataset_file
-                    )
+                    output_file = generate_output_file(output_folder, dataset_file)
 
                     print(
                         "writing predictions in {}".format(output_file), flush=True,
