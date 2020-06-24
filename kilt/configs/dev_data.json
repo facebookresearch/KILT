@@ -16,6 +16,6 @@
         "CWEB": "/checkpoint/fabiopetroni/KILT/datasets/cweb-dev-kilt.jsonl"
     },
     "dialogue": {
-        "Wizard of Wikipedia": ""
+        "Wizard of Wikipedia": "/checkpoint/fabiopetroni/KILT/datasets/wow-dev-kilt.jsonl"
     }
 }
