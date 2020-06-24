@@ -8,7 +8,7 @@ import sys
 
 from collections import Counter
 
-import kilt.evaluation_metrics as retrieval_metrics
+import kilt.eval_retrieval as retrieval_metrics
 from kilt import kilt_utils
 
 
@@ -58,7 +58,7 @@ def kilt_qa_exact_match(guess_dataset, gold_dataset):
     total = 0
     total_em = 0
     for guess, gold in zip(guess_dataset, gold_dataset):
-        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold)
+        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold, ks=[5])
         if ranking_metrics["Rprec"] == 1:
             ground_truths = [item["answer"] for item in gold["output"]]
             total_em += metric_max_over_ground_truths(
@@ -86,7 +86,7 @@ def kilt_qa_f1(guess_dataset, gold_dataset):
     total = 0
     total_em = 0
     for guess, gold in zip(guess_dataset, gold_dataset):
-        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold)
+        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold, ks=[5])
         if ranking_metrics["Rprec"] == 1:
             ground_truths = [item["answer"] for item in gold["output"]]
             total_em += metric_max_over_ground_truths(
@@ -213,7 +213,7 @@ def evaluate(gold, guess):
     gold_records, guess_records = validate_input(gold_records, guess_records)
 
     # 1. retrieval performance
-    retrieval_result = retrieval_metrics.compute(gold_records, guess_records)
+    retrieval_result = retrieval_metrics.compute(gold_records, guess_records, ks=[5])
     print("retrieval_result:")
     pp.pprint(retrieval_result)
 
