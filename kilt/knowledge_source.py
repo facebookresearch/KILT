@@ -152,7 +152,7 @@ def _get_title_from_wikipedia_url(url, client=None):
 
 class KnowledgeSource:
     def __init__(self):
-        self.client = MongoClient("mongodb://100.97.69.169:27017/admin")
+        self.client = MongoClient(MONGO_CONNECTION_STRING)
         self.db = self.client.kilt.knowledgesource
 
         self.Wikipedia_title2id = None
