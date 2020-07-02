@@ -33,7 +33,11 @@ ks.get_num_pages()
 
 # get page by id
 page = ks.get_page_by_id(27097632)
+
+# get pages by title
+page = ks.get_page_by_title("Michael Jordan")
 ```
+
 
 Structure of each record:
 ```python
@@ -44,7 +48,4 @@ Structure of each record:
  'anchors': [{"text":,"href":,"paragraph_id":,"start":,"end":} ]  , 
  'categories': 'comma separated list of categories'
  }
-```
-# get pages by title
-page = ks.get_page_by_title("Michael Jordan")
 ```
