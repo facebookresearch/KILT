@@ -33,7 +33,18 @@ ks.get_num_pages()
 
 # get page by id
 page = ks.get_page_by_id(27097632)
+```
 
+Structure of each record:
+```python
+{
+ 'wikipedia_title': 'Email marketing',
+ 'wikipedia_id': 1101759, 
+ 'text': ['p1', 'p2',...., 'pn'], # list of paragraph text
+ 'anchors': [{"text":,"href":,"paragraph_id":,"start":,"end":} ]  , 
+ 'categories': 'comma separated list of categories'
+ }
+```
 # get pages by title
 page = ks.get_page_by_title("Michael Jordan")
 ```
