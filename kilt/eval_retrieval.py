@@ -18,19 +18,7 @@ def _get_gold_ids_list(datapoint):
     return gold_wikipedia_ids_list
 
 
-def precision_at_1(datapoint, predicted_page_ids):
-    p = 0
-    if predicted_page_ids and len(predicted_page_ids) > 0:
-        winner_id = predicted_page_ids[0]
-        for output in datapoint["output"]:
-            for provenance in output["provenance"]:
-                if str(provenance["wikipedia_id"]).strip() == str(winner_id).strip():
-                    p = 1
-                    return p
-    return p
-
-
-def recall_at_k(datapoint, predicted_page_ids, k):
+def get_rank(datapoint, predicted_page_ids, k):
     """
     The main idea is to consider each evidence set as a single point in the rank.
     The score in the rank for an evidence set is given by the lowest scored evidence in the set.
@@ -38,7 +26,9 @@ def recall_at_k(datapoint, predicted_page_ids, k):
 
     assert k > 0, "k must be a positive integer grater than 0."
 
-    r = 0
+    rank = []
+    num_distinct_evidence_sets = 0
+
     if predicted_page_ids and len(predicted_page_ids) > 0:
 
         # 1. collect evidence sets and their sizes
@@ -52,8 +42,7 @@ def recall_at_k(datapoint, predicted_page_ids, k):
             if e_set not in evidence_sets:  # no duplicate evidence set
                 evidence_sets.append(e_set)
                 e_size[len(e_set)] += 1
-
-        denominator = len(evidence_sets)
+        num_distinct_evidence_sets = len(evidence_sets)
 
         # 2. check what's the minimum number of predicted pages needed to get a robust R@k
         min_prediction_size = 0
@@ -66,7 +55,8 @@ def recall_at_k(datapoint, predicted_page_ids, k):
                     break
             if c == k:
                 break
-
+        # if the number of evidence sets is smaller than k
+        min_prediction_size += k - c
         assert (
             len(predicted_page_ids) >= min_prediction_size
         ), f"you should provide at least {min_prediction_size} predicted pages for a robust recall@{k} computation"
@@ -102,8 +92,25 @@ def recall_at_k(datapoint, predicted_page_ids, k):
             if not found:
                 rank.append(False)
 
-        # 4. recall @ k
-        r = rank[:k].count(True) / denominator
+    return rank, num_distinct_evidence_sets
+
+
+def precision_at_k(datapoint, predicted_page_ids, k):
+
+    rank, _ = get_rank(datapoint, predicted_page_ids, k)
+
+    # precision @ k
+    p = rank[:k].count(True) / k
+
+    return p
+
+
+def recall_at_k(datapoint, predicted_page_ids, k):
+
+    rank, num_distinct_evidence_sets = get_rank(datapoint, predicted_page_ids, k)
+
+    # recall @ k
+    r = rank[:k].count(True) / num_distinct_evidence_sets
 
     return r
 
@@ -172,13 +179,14 @@ def rprecision(datapoint, predicted_page_ids):
 
 def get_ranking_metrics(guess_item, gold_item, ks):
 
-    p1 = 0
     Rprec = 0
     R_at_k = {"recall@{}".format(k): 0 for k in ks}
+    P_at_k = {"precision@{}".format(k): 0 for k in ks}
 
     assert (
         "output" in guess_item and len(guess_item["output"]) == 1
     ), "guess should provide exactly one output"
+
     output = guess_item["output"][0]
     guess_wikipedia_ids = []
     for provenance in output["provenance"]:
@@ -190,21 +198,23 @@ def get_ranking_metrics(guess_item, gold_item, ks):
             guess_wikipedia_ids.append(provenance["wikipedia_id"])
 
     if len(guess_wikipedia_ids) > 0:
-        p1 = precision_at_1(gold_item, guess_wikipedia_ids)
         Rprec = rprecision(gold_item, guess_wikipedia_ids)
         for k in ks:
             R_at_k["recall@{}".format(k)] = recall_at_k(
                 gold_item, guess_wikipedia_ids, k
             )
+            P_at_k["precision@{}".format(k)] = precision_at_k(
+                gold_item, guess_wikipedia_ids, k
+            )
 
-    return {"p1": p1, "Rprec": Rprec, **R_at_k}
+    return {"Rprec": Rprec, **R_at_k, **P_at_k}
 
 
 def compute(gold_dataset, guess_dataset, ks):
 
-    p1 = 0.0
     Rprec = 0.0
     R_at_k = {"recall@{}".format(k): 0 for k in ks}
+    P_at_k = {"precision@{}".format(k): 0 for k in ks}
 
     assert len(guess_dataset) == len(
         gold_dataset
@@ -215,17 +225,19 @@ def compute(gold_dataset, guess_dataset, ks):
 
     for guess_item, gold_item in zip(guess_dataset, gold_dataset):
         ranking_metrics = get_ranking_metrics(guess_item, gold_item, ks)
-        p1 += ranking_metrics["p1"]
         Rprec += ranking_metrics["Rprec"]
         for k in ks:
             R_at_k["recall@{}".format(k)] += ranking_metrics["recall@{}".format(k)]
+            P_at_k["precision@{}".format(k)] += ranking_metrics[
+                "precision@{}".format(k)
+            ]
 
-    p1 /= len(guess_dataset)
     Rprec /= len(guess_dataset)
     for k in ks:
         R_at_k["recall@{}".format(k)] /= len(guess_dataset)
+        P_at_k["precision@{}".format(k)] /= len(guess_dataset)
 
-    return {"p1": p1, "Rprec": Rprec, **R_at_k}
+    return {"Rprec": Rprec, **R_at_k, **P_at_k}
 
 
 if __name__ == "__main__":
@@ -235,8 +247,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--ks",
         type=str,
-        default="5,10,20",
-        help="Comma separated list of positive integers for recall@k",
+        default="1,5,10,20",
+        help="Comma separated list of positive integers for recall@k and precision@k",
     )
 
     args = parser.parse_args()
