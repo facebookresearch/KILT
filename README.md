@@ -20,6 +20,34 @@ export PYTHONPATH=.
 python scripts/evaluate_ranking.py -m {dpr/kilt/drqa}
 ```
 
+## KILT data format
+
+```python
+{'id': # original data point id if available otherwise unique id
+ 'input': # question / claim / sentence
+ 'output': [ # list of valid answers, at least one
+    {
+    'answer': # answer in textual form
+    'provenance': [
+        # list of relevant WikipediaPages / Spans as provenance for the answer from the ks
+        {
+            'wikipedia_id': ,  # *mandatory* - ID Wikipedia Page
+            'title': , # Title Wikipedia Page
+            'start_paragraph_id': , # start paragraph id with relevant info
+            'start_character': , 
+            'end_paragraph_id': ,  # end paragraph id
+            'end_character': , 
+            'bleu_score': # 1.0 when gold data is exactly matched, lower for fuzzy matches 
+            'meta': # dataset/task specific
+        }
+        ] 
+      }
+    ],
+ 'meta': {} # dataset/task specific
+ }
+```
+
+
 ## Knowledge Source
 
 ```python
