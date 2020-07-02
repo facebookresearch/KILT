@@ -49,14 +49,7 @@ def recall_at_k(datapoint, predicted_page_ids, k):
                 str(provenance["wikipedia_id"]).strip()
                 for provenance in output["provenance"]
             }
-            if e_set in evidence_sets:
-                print(
-                    "WARNING, evidence set {} is already in evidence_sets {}".format(
-                        e_set, evidence_sets
-                    )
-                )
-                pass
-            else:
+            if e_set not in evidence_sets:  # no duplicate evidence set
                 evidence_sets.append(e_set)
                 e_size[len(e_set)] += 1
 
@@ -66,7 +59,6 @@ def recall_at_k(datapoint, predicted_page_ids, k):
         min_prediction_size = 0
         c = 0
         for size, freq in sorted(e_size.items(), reverse=True):
-            print(size, freq)
             for _ in range(freq):
                 min_prediction_size += size
                 c += 1
