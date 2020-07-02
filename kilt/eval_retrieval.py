@@ -78,18 +78,32 @@ def recall_at_k(datapoint, predicted_page_ids, k):
         for page in predicted_page_ids:
             page = str(page).strip()
             found = False
-            for e_set in evidence_sets:
+            for idx, e_set in enumerate(evidence_sets):
+
+                e_set_id = f"evidence_set:{idx}"
+
                 if page in e_set:
                     found = True
+
+                    # remove from the rank previous points referring to this evidence set
+                    if e_set_id in rank:
+                        rank.remove(e_set_id)
+
+                    # remove the page from the evidence set
                     e_set.remove(page)
+
                     if len(e_set) == 0:
                         # it was the last evidence, it counts as true in the rank
                         rank.append(True)
+                    else:
+                        # add a point for this partial evidence set
+                        rank.append(e_set_id)
+
             if not found:
                 rank.append(False)
 
         # 4. recall @ k
-        r = sum(rank[:k]) / denominator
+        r = rank[:k].count(True) / denominator
 
     return r
 
