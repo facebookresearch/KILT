@@ -1,4 +1,5 @@
 import argparse
+from collections import defaultdict
 
 from kilt import kilt_utils
 
@@ -30,21 +31,79 @@ def precision_at_1(datapoint, predicted_page_ids):
 
 
 def recall_at_k(datapoint, predicted_page_ids, k):
+    """
+    The main idea is to consider each evidence set as a single point in the rank.
+    The score in the rank for an evidence set is given by the lowest scored evidence in the set.
+    """
+
     assert k > 0, "k must be a positive integer grater than 0."
 
     r = 0
     if predicted_page_ids and len(predicted_page_ids) > 0:
-        top_k = {str(e).strip() for e in predicted_page_ids[:k]}
 
-        recalls = []
+        # 1. collect evidence sets and their sizes
+        evidence_sets = []
+        e_size = defaultdict(int)
         for output in datapoint["output"]:
-            relevant_set = {
+            e_set = {
                 str(provenance["wikipedia_id"]).strip()
                 for provenance in output["provenance"]
             }
-            recalls.append(len(relevant_set.intersection(top_k)) / len(relevant_set))
+            if e_set not in evidence_sets:  # no duplicate evidence set
+                evidence_sets.append(e_set)
+                e_size[len(e_set)] += 1
 
-        r = max(recalls)
+        denominator = len(evidence_sets)
+
+        # 2. check what's the minimum number of predicted pages needed to get a robust R@k
+        min_prediction_size = 0
+        c = 0
+        for size, freq in sorted(e_size.items(), reverse=True):
+            for _ in range(freq):
+                min_prediction_size += size
+                c += 1
+                if c == k:
+                    break
+            if c == k:
+                break
+
+        assert (
+            len(predicted_page_ids) >= min_prediction_size
+        ), f"you should provide at least {min_prediction_size} predicted pages for a robust recall@{k} computation"
+
+        # 3. rank by gruping pages in each evidence set (each evidence set count as 1),
+        # the position in the rank of each evidence set is given by the last page in predicted_page_ids
+        # non evidence pages counts as 1
+        rank = []
+        for page in predicted_page_ids:
+            page = str(page).strip()
+            found = False
+            for idx, e_set in enumerate(evidence_sets):
+
+                e_set_id = f"evidence_set:{idx}"
+
+                if page in e_set:
+                    found = True
+
+                    # remove from the rank previous points referring to this evidence set
+                    if e_set_id in rank:
+                        rank.remove(e_set_id)
+
+                    # remove the page from the evidence set
+                    e_set.remove(page)
+
+                    if len(e_set) == 0:
+                        # it was the last evidence, it counts as true in the rank
+                        rank.append(True)
+                    else:
+                        # add a point for this partial evidence set
+                        rank.append(e_set_id)
+
+            if not found:
+                rank.append(False)
+
+        # 4. recall @ k
+        r = rank[:k].count(True) / denominator
 
     return r
 
