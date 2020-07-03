@@ -44,7 +44,7 @@ def get_rank(datapoint, predicted_page_ids, k):
                 e_size[len(e_set)] += 1
         num_distinct_evidence_sets = len(evidence_sets)
 
-        # 2. check what's the minimum number of predicted pages needed to get a robust R@k
+        # 2. check what's the minimum number of predicted pages needed to get a robust P/R@k
         min_prediction_size = 0
         c = 0
         for size, freq in sorted(e_size.items(), reverse=True):
