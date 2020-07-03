@@ -109,8 +109,13 @@ def recall_at_k(datapoint, predicted_page_ids, k):
 
     rank, num_distinct_evidence_sets = get_rank(datapoint, predicted_page_ids, k)
 
-    # recall @ k
-    r = rank[:k].count(True) / num_distinct_evidence_sets
+    r = 0
+
+    if num_distinct_evidence_sets > 0:
+        # recall @ k
+        r = rank[:k].count(True) / num_distinct_evidence_sets
+    else:
+        print("WARNING: the number of distinct evidence sets is 0 for", datapoint)
 
     return r
 
