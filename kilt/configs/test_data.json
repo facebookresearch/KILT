@@ -13,7 +13,8 @@
     "entity linking": {
         "AIDA-YAGO2": "/checkpoint/fabiopetroni/KILT/datasets/aidayago2-test-kilt.jsonl",
         "WNED": "/checkpoint/fabiopetroni/KILT/datasets/wned-test-kilt.jsonl",
-        "CWEB": "/checkpoint/fabiopetroni/KILT/datasets/cweb-test-kilt.jsonl"
+        "CWEB": "/checkpoint/fabiopetroni/KILT/datasets/cweb-test-kilt.jsonl",
+        "TACKBP-2010": "/checkpoint/fabiopetroni/KILT/datasets/tackbp2010-test-kilt.jsonl"
     },
     "dialogue": {
         "Wizard of Wikipedia": "/checkpoint/fabiopetroni/KILT/datasets/wow-test-kilt.jsonl"
