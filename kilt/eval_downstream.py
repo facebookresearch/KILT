@@ -12,6 +12,14 @@ import kilt.eval_retrieval as retrieval_metrics
 from kilt import kilt_utils
 
 
+def get_gold_answers(gold):
+    ground_truths = set()
+    for item in gold["output"]:
+        if "answer" in item and item["answer"] and len(item["answer"].strip()) > 0:
+            ground_truths.add(item["answer"].strip())
+    return ground_truths
+
+
 def exact_match(guess_dataset, gold_dataset):
     """
     Calculate exact match score between two datasets.
@@ -25,11 +33,15 @@ def exact_match(guess_dataset, gold_dataset):
     for guess_item, gold_item in zip(guess_dataset, gold_dataset):
         total_count += 1
         # check if each output of guess file exist in set of candidate answers
-        gold_candidate_answers = set(item["answer"] for item in gold_item["output"])
+        gold_candidate_answers = get_gold_answers(gold_item)
+
         guess_candidate_answers = set(item["answer"] for item in guess_item["output"])
         if all(x in gold_candidate_answers for x in guess_candidate_answers):
             total_matches += 1
-    return total_matches / total_count
+    result = 0
+    if total_count > 0:
+        result = total_matches / total_count
+    return result
 
 
 def metric_max_over_ground_truths(metric_fn, prediction, ground_truths):
@@ -46,26 +58,34 @@ def qa_exact_match(guess_dataset, gold_dataset):
     for guess, gold in zip(guess_dataset, gold_dataset):
         if len(gold["output"]) == 0:
             raise Exception("bad gold")
-        ground_truths = [item["answer"] for item in gold["output"]]
+
+        ground_truths = get_gold_answers(gold)
+
         total_em += metric_max_over_ground_truths(
             exact_match_score_qa, guess["output"][0]["answer"], ground_truths
         )
         total += 1
-    return total_em / total
+    result = 0
+    if total > 0:
+        result = total_em / total
+    return result
 
 
 def kilt_qa_exact_match(guess_dataset, gold_dataset):
     total = 0
     total_em = 0
     for guess, gold in zip(guess_dataset, gold_dataset):
-        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold, ks=[5])
+        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold, ks=[1])
         if ranking_metrics["Rprec"] == 1:
-            ground_truths = [item["answer"] for item in gold["output"]]
+            ground_truths = get_gold_answers(gold)
             total_em += metric_max_over_ground_truths(
                 exact_match_score_qa, guess["output"][0]["answer"], ground_truths
             )
         total += 1
-    return total_em / total
+    result = 0
+    if total > 0:
+        result = total_em / total
+    return result
 
 
 def qa_f1(guess_dataset, gold_dataset):
@@ -74,26 +94,32 @@ def qa_f1(guess_dataset, gold_dataset):
     for guess, gold in zip(guess_dataset, gold_dataset):
         if len(gold["output"]) == 0:
             raise Exception("bad gold")
-        ground_truths = [item["answer"] for item in gold["output"]]
+        ground_truths = get_gold_answers(gold)
         total_f1 += metric_max_over_ground_truths(
             f1_score, guess["output"][0]["answer"], ground_truths
         )
         total += 1
-    return total_f1 / total
+    result = 0
+    if total > 0:
+        result = total_f1 / total
+    return result
 
 
 def kilt_qa_f1(guess_dataset, gold_dataset):
     total = 0
     total_em = 0
     for guess, gold in zip(guess_dataset, gold_dataset):
-        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold, ks=[5])
+        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold, ks=[1])
         if ranking_metrics["Rprec"] == 1:
-            ground_truths = [item["answer"] for item in gold["output"]]
+            ground_truths = get_gold_answers(gold)
             total_em += metric_max_over_ground_truths(
                 f1_score, guess["output"][0]["answer"], ground_truths
             )
         total += 1
-    return total_em / total
+    result = 0
+    if total > 0:
+        result = total_em / total
+    return result
 
 
 def normalize_answer(s):
@@ -145,7 +171,9 @@ def calculate_metrics(gold_records, guess_records):
     ), "different size gold: {} guess: {}".format(len(gold_records), len(guess_records))
 
     for gold, guess in zip(gold_records, guess_records):
-        assert gold["id"] == guess["id"], "Items must have same order with same IDs"
+        assert (
+            str(gold["id"]).strip() == str(guess["id"]).strip()
+        ), "Items must have same order with same IDs"
 
     return {
         "em": exact_match(guess_records, gold_records),
@@ -161,7 +189,7 @@ def calculate_kilt_metrics(gold_records, guess_records):
     ), "different size gold: {} guess: {}".format(len(gold_records), len(guess_records))
 
     for gold, guess in zip(gold_records, guess_records):
-        assert gold["id"] == guess["id"], "Items must have same order with same IDs"
+        assert str(gold["id"]).strip() == str(guess["id"]).strip(), "Items must have same order with same IDs"
 
     return {
         "kilt_em": kilt_qa_exact_match(guess_records, gold_records),
@@ -177,17 +205,17 @@ def validate_input(gold_records, guess_records):
                 len(gold_records), len(guess_records)
             )
         )
-        sys.exit(-1)
+        # sys.exit(-1)
 
     # align order
     gold_ids = []
     for gold in gold_records:
-        assert gold["id"] not in gold_ids, "Gold IDs should be unique"
-        gold_ids.append(gold["id"])
+        assert str(gold["id"]).strip() not in gold_ids, "Gold IDs should be unique"
+        gold_ids.append(str(gold["id"]).strip())
 
     id2guess_record = {}
     for guess in guess_records:
-        id2guess_record[guess["id"]] = guess
+        id2guess_record[str(guess["id"]).strip()] = guess
 
     guess_records = []
     for id in gold_ids:
@@ -196,7 +224,7 @@ def validate_input(gold_records, guess_records):
 
     temp_gold_records = []
     for gold in gold_records:
-        if gold["id"] in id2guess_record:
+        if str(gold["id"]).strip() in id2guess_record:
             temp_gold_records.append(gold)
     gold_records = temp_gold_records
 
@@ -209,11 +237,11 @@ def evaluate(gold, guess):
     gold_records = kilt_utils.load_data(gold)
     guess_records = kilt_utils.load_data(guess)
 
-    # TODO 0. validate input
+    # 0. validate input
     gold_records, guess_records = validate_input(gold_records, guess_records)
 
     # 1. retrieval performance
-    retrieval_result = retrieval_metrics.compute(gold_records, guess_records, ks=[5])
+    retrieval_result = retrieval_metrics.compute(gold_records, guess_records, ks=[1])
     print("retrieval_result:")
     pp.pprint(retrieval_result)
 

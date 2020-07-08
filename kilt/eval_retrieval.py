@@ -2,6 +2,7 @@ import argparse
 from collections import defaultdict
 
 from kilt import kilt_utils
+from kilt import eval_downstream
 
 
 def _get_gold_ids_list(datapoint):
@@ -194,13 +195,16 @@ def get_ranking_metrics(guess_item, gold_item, ks):
 
     output = guess_item["output"][0]
     guess_wikipedia_ids = []
-    for provenance in output["provenance"]:
-        if "wikipedia_id" not in provenance:
-            print(
-                "wikipedia_id not in provenance for-> {}\n skipping".format(provenance)
-            )
-        else:
-            guess_wikipedia_ids.append(provenance["wikipedia_id"])
+    if "provenance" in output:
+        for provenance in output["provenance"]:
+            if "wikipedia_id" not in provenance:
+                print(
+                    "wikipedia_id not in provenance for-> {}\n skipping".format(
+                        provenance
+                    )
+                )
+            else:
+                guess_wikipedia_ids.append(provenance["wikipedia_id"])
 
     if len(guess_wikipedia_ids) > 0:
         Rprec = rprecision(gold_item, guess_wikipedia_ids)
@@ -226,7 +230,9 @@ def compute(gold_dataset, guess_dataset, ks):
     ), "different size gold: {} guess: {}".format(len(guess_dataset), len(gold_dataset))
 
     for gold, guess in zip(guess_dataset, gold_dataset):
-        assert gold["id"] == guess["id"], "Items must have same order with same IDs"
+        assert (
+            str(gold["id"]).strip() == str(guess["id"]).strip()
+        ), "Items must have same order with same IDs"
 
     for guess_item, gold_item in zip(guess_dataset, gold_dataset):
         ranking_metrics = get_ranking_metrics(guess_item, gold_item, ks)
@@ -237,10 +243,11 @@ def compute(gold_dataset, guess_dataset, ks):
                 "precision@{}".format(k)
             ]
 
-    Rprec /= len(guess_dataset)
-    for k in ks:
-        R_at_k["recall@{}".format(k)] /= len(guess_dataset)
-        P_at_k["precision@{}".format(k)] /= len(guess_dataset)
+    if len(guess_dataset) > 0:
+        Rprec /= len(guess_dataset)
+        for k in ks:
+            R_at_k["recall@{}".format(k)] /= len(guess_dataset)
+            P_at_k["precision@{}".format(k)] /= len(guess_dataset)
 
     return {"Rprec": Rprec, **R_at_k, **P_at_k}
 
@@ -261,5 +268,10 @@ if __name__ == "__main__":
 
     gold_dataset = kilt_utils.load_data(args.gold)
     guess_dataset = kilt_utils.load_data(args.guess)
+
+    # 0. validate input
+    # gold_dataset, guess_dataset = eval_downstream.validate_input(
+    #    gold_dataset, guess_dataset
+    # )
 
     print(compute(gold_dataset, guess_dataset, args.ks))
