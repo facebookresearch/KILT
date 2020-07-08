@@ -11,7 +11,8 @@
         "Zero Shot RE": "/checkpoint/fabiopetroni/KILT/datasets/zeroshot-train-kilt.jsonl"
     },
     "entity linking": {
-        "AIDA-YAGO2": "/checkpoint/fabiopetroni/KILT/datasets/aidayago2-train-kilt.jsonl"
+        "AIDA-YAGO2": "/checkpoint/fabiopetroni/KILT/datasets/aidayago2-train-kilt.jsonl",
+        "TACKBP-2010": "/checkpoint/fabiopetroni/KILT/datasets/tackbp2010-train-kilt.jsonl"
     },
     "dialogue": {
         "Wizard of Wikipedia": "/checkpoint/fabiopetroni/KILT/datasets/wow-train-kilt.jsonl"
