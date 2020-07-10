@@ -44,7 +44,7 @@ def get_rank(datapoint, predicted_page_ids, k, rank_keys):
                 evidence_sets.append(e_set)
                 e_size[len(e_set)] += 1
         num_distinct_evidence_sets = len(evidence_sets)
-        
+
         # 2. check what's the minimum number of predicted pages needed to get a robust P/R@k
         min_prediction_size = 0
         c = 0
@@ -108,7 +108,9 @@ def precision_at_k(datapoint, predicted_page_ids, k, rank_keys):
 
 def recall_at_k(datapoint, predicted_page_ids, k, rank_keys):
 
-    rank, num_distinct_evidence_sets = get_rank(datapoint, predicted_page_ids, k, rank_keys=rank_keys)
+    rank, num_distinct_evidence_sets = get_rank(
+        datapoint, predicted_page_ids, k, rank_keys=rank_keys
+    )
 
     r = 0
 
@@ -192,18 +194,23 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
 
     output = guess_item["output"][0]
     guess_wikipedia_ids = []
-    
+
     if "provenance" in output:
         for provenance in output["provenance"]:
             if any(rank_key not in provenance for rank_key in rank_keys):
                 print(
-                    "one or more rank keys not in provenance for-> {}\n skipping".format(provenance)
+                    "one or more rank keys not in provenance for-> {}\n skipping".format(
+                        provenance
+                    )
                 )
             else:
-                guess_wikipedia_ids.append("+".join([str(provenance[rank_key]).strip() for rank_key in rank_keys]))
+                guess_wikipedia_ids.append(
+                    "+".join(
+                        [str(provenance[rank_key]).strip() for rank_key in rank_keys]
+                    )
+                )
 
     guess_wikipedia_ids = remove_duplicates(guess_wikipedia_ids)
-            
 
     if len(guess_wikipedia_ids) > 0:
         Rprec = rprecision(gold_item, guess_wikipedia_ids)
@@ -258,12 +265,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--ks",
         type=str,
+        required=False,
         default="1,5,10,20",
         help="Comma separated list of positive integers for recall@k and precision@k",
     )
     parser.add_argument(
         "--rank_keys",
         type=str,
+        required=False,
         default="wikipedia_id",
         help="Comma separated list of rank keys for recall@k and precision@k",
     )
@@ -280,4 +289,4 @@ if __name__ == "__main__":
         gold_dataset, guess_dataset
     )
 
-    print(compute(gold_dataset, guess_dataset, args.ks))
+    print(compute(gold_dataset, guess_dataset, args.ks, args.rank_keys))
