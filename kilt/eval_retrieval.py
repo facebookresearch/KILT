@@ -2,6 +2,7 @@ import argparse
 from collections import defaultdict
 
 from kilt import kilt_utils
+from kilt import eval_downstream
 
 
 def _get_gold_ids_list(datapoint):
@@ -203,6 +204,7 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
 
     guess_wikipedia_ids = remove_duplicates(guess_wikipedia_ids)
             
+
     if len(guess_wikipedia_ids) > 0:
         Rprec = rprecision(gold_item, guess_wikipedia_ids)
         for k in ks:
@@ -227,7 +229,9 @@ def compute(gold_dataset, guess_dataset, ks, rank_keys):
     ), "different size gold: {} guess: {}".format(len(guess_dataset), len(gold_dataset))
 
     for gold, guess in zip(guess_dataset, gold_dataset):
-        assert gold["id"] == guess["id"], "Items must have same order with same IDs"
+        assert (
+            str(gold["id"]).strip() == str(guess["id"]).strip()
+        ), "Items must have same order with same IDs"
 
     for guess_item, gold_item in zip(guess_dataset, gold_dataset):
         ranking_metrics = get_ranking_metrics(guess_item, gold_item, ks, rank_keys)
@@ -238,10 +242,11 @@ def compute(gold_dataset, guess_dataset, ks, rank_keys):
                 "precision@{}".format(k)
             ]
 
-    Rprec /= len(guess_dataset)
-    for k in ks:
-        R_at_k["recall@{}".format(k)] /= len(guess_dataset)
-        P_at_k["precision@{}".format(k)] /= len(guess_dataset)
+    if len(guess_dataset) > 0:
+        Rprec /= len(guess_dataset)
+        for k in ks:
+            R_at_k["recall@{}".format(k)] /= len(guess_dataset)
+            P_at_k["precision@{}".format(k)] /= len(guess_dataset)
 
     return {"Rprec": Rprec, **R_at_k, **P_at_k}
 
@@ -270,4 +275,9 @@ if __name__ == "__main__":
     gold_dataset = kilt_utils.load_data(args.gold)
     guess_dataset = kilt_utils.load_data(args.guess)
 
-    print(compute(gold_dataset, guess_dataset, args.ks, args.rank_keys))
+    # 0. validate input
+    gold_dataset, guess_dataset = eval_downstream.validate_input(
+        gold_dataset, guess_dataset
+    )
+
+    print(compute(gold_dataset, guess_dataset, args.ks))

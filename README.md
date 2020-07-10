@@ -75,5 +75,7 @@ Structure of each record:
  'text': ['p1', 'p2',...., 'pn'], # list of paragraph text
  'anchors': [{"text":,"href":,"paragraph_id":,"start":,"end":} ]  , 
  'categories': 'comma separated list of categories'
+ 'history': # some info from wikipedia, including original url
+ 'wikidata_info': # wikidata info
  }
 ```
