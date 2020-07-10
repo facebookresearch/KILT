@@ -207,7 +207,6 @@ def validate_input(gold_records, guess_records):
                 len(gold_records), len(guess_records)
             )
         )
-        # sys.exit(-1)
 
     # align order
     gold_ids = []
