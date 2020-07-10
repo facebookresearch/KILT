@@ -217,7 +217,9 @@ def validate_input(gold_records, guess_records):
 
     id2guess_record = {}
     for guess in guess_records:
-        assert str(guess["id"]).strip() not in id2guess_record
+        assert (
+            str(guess["id"]).strip() not in id2guess_record
+        ), "Prediction IDs should be unique"
         id2guess_record[str(guess["id"]).strip()] = guess
 
     guess_records = []
