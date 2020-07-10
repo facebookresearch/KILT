@@ -189,7 +189,9 @@ def calculate_kilt_metrics(gold_records, guess_records):
     ), "different size gold: {} guess: {}".format(len(gold_records), len(guess_records))
 
     for gold, guess in zip(gold_records, guess_records):
-        assert str(gold["id"]).strip() == str(guess["id"]).strip(), "Items must have same order with same IDs"
+        assert (
+            str(gold["id"]).strip() == str(guess["id"]).strip()
+        ), "Items must have same order with same IDs"
 
     return {
         "kilt_em": kilt_qa_exact_match(guess_records, gold_records),
@@ -221,12 +223,8 @@ def validate_input(gold_records, guess_records):
     for id in gold_ids:
         if id in id2guess_record:
             guess_records.append(id2guess_record[id])
-
-    temp_gold_records = []
-    for gold in gold_records:
-        if str(gold["id"]).strip() in id2guess_record:
-            temp_gold_records.append(gold)
-    gold_records = temp_gold_records
+        else:
+            print("ERROR: no prediction provided for id: {}".format(id))
 
     return gold_records, guess_records
 
