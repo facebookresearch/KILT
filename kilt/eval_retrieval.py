@@ -152,18 +152,7 @@ def _computeRprec(gold_wikipedia_ids, predicted_page_ids):
     R = len(gold_wikipedia_ids)
     num = 0
 
-    deduplicated_page_ids = []
-
-    for x in predicted_page_ids:
-        if x not in deduplicated_page_ids:
-            deduplicated_page_ids.append(x)
-            # consider only the first R predictions
-            if len(deduplicated_page_ids) == R:
-                break
-
-    assert len(deduplicated_page_ids) <= R
-
-    for prediction in deduplicated_page_ids:
+    for prediction in predicted_page_ids[:R]:
         if str(prediction).strip() in gold_wikipedia_ids:
             num += 1
 
@@ -180,6 +169,14 @@ def rprecision(datapoint, predicted_page_ids):
         Rprec = _computeRprec(gold_wikipedia_ids, predicted_page_ids)
         Rprec_vector.append(Rprec)
     return max(Rprec_vector)
+
+
+def remove_duplicates(obj):
+    obj_tmp = []
+    for o in obj:
+        if o not in obj_tmp:
+            obj_tmp.append(o)
+    return obj_tmp
 
 
 def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
@@ -202,6 +199,8 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
         else:
             guess_wikipedia_ids.append("+".join([str(provenance[rank_key]).strip() for rank_key in rank_keys]))
 
+    guess_wikipedia_ids = remove_duplicates(guess_wikipedia_ids)
+            
     if len(guess_wikipedia_ids) > 0:
         Rprec = rprecision(gold_item, guess_wikipedia_ids)
         for k in ks:
