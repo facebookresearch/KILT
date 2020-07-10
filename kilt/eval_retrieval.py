@@ -270,8 +270,8 @@ if __name__ == "__main__":
     guess_dataset = kilt_utils.load_data(args.guess)
 
     # 0. validate input
-    # gold_dataset, guess_dataset = eval_downstream.validate_input(
-    #    gold_dataset, guess_dataset
-    # )
+    gold_dataset, guess_dataset = eval_downstream.validate_input(
+        gold_dataset, guess_dataset
+    )
 
     print(compute(gold_dataset, guess_dataset, args.ks))
