@@ -191,13 +191,15 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
 
     output = guess_item["output"][0]
     guess_wikipedia_ids = []
-    for provenance in output["provenance"]:
-        if any(rank_key not in provenance for rank_key in rank_keys):
-            print(
-                "one or more rank keys not in provenance for-> {}\n skipping".format(provenance)
-            )
-        else:
-            guess_wikipedia_ids.append("+".join([str(provenance[rank_key]).strip() for rank_key in rank_keys]))
+    
+    if "provenance" in output:
+        for provenance in output["provenance"]:
+            if any(rank_key not in provenance for rank_key in rank_keys):
+                print(
+                    "one or more rank keys not in provenance for-> {}\n skipping".format(provenance)
+                )
+            else:
+                guess_wikipedia_ids.append("+".join([str(provenance[rank_key]).strip() for rank_key in rank_keys]))
 
     guess_wikipedia_ids = remove_duplicates(guess_wikipedia_ids)
             
