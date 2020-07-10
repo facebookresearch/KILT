@@ -75,7 +75,9 @@ def kilt_qa_exact_match(guess_dataset, gold_dataset):
     total = 0
     total_em = 0
     for guess, gold in zip(guess_dataset, gold_dataset):
-        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold, ks=[1])
+        ranking_metrics = retrieval_metrics.get_ranking_metrics(
+            guess, gold, ks=[], rank_keys=["wikipedia_id"]
+        )
         if ranking_metrics["Rprec"] == 1:
             ground_truths = get_gold_answers(gold)
             total_em += metric_max_over_ground_truths(
@@ -109,7 +111,9 @@ def kilt_qa_f1(guess_dataset, gold_dataset):
     total = 0
     total_em = 0
     for guess, gold in zip(guess_dataset, gold_dataset):
-        ranking_metrics = retrieval_metrics.get_ranking_metrics(guess, gold, ks=[1])
+        ranking_metrics = retrieval_metrics.get_ranking_metrics(
+            guess, gold, ks=[], rank_keys=["wikipedia_id"]
+        )
         if ranking_metrics["Rprec"] == 1:
             ground_truths = get_gold_answers(gold)
             total_em += metric_max_over_ground_truths(
@@ -207,7 +211,6 @@ def validate_input(gold_records, guess_records):
                 len(gold_records), len(guess_records)
             )
         )
-        # sys.exit(-1)
 
     # align order
     gold_ids = []
@@ -242,7 +245,9 @@ def evaluate(gold, guess):
     gold_records, guess_records = validate_input(gold_records, guess_records)
 
     # 1. retrieval performance
-    retrieval_result = retrieval_metrics.compute(gold_records, guess_records, ks=[1])
+    retrieval_result = retrieval_metrics.compute(
+        gold_records, guess_records, ks=[], rank_keys=["wikipedia_id"]
+    )
     print("retrieval_result:")
     pp.pprint(retrieval_result)
 
