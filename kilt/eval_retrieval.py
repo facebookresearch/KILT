@@ -10,8 +10,9 @@ def _get_gold_ids_list(datapoint):
     gold_wikipedia_ids_list = []
     for output in datapoint["output"]:
         single_wikipedia_ids_list = []
-        for provenance in output["provenance"]:
-            single_wikipedia_ids_list.append(str(provenance["wikipedia_id"]))
+        if "provenance" in output:
+            for provenance in output["provenance"]:
+                single_wikipedia_ids_list.append(str(provenance["wikipedia_id"]))
         gold_wikipedia_ids_list.append(list(set(single_wikipedia_ids_list)))
 
     # consider only unique ids
@@ -36,10 +37,11 @@ def get_rank(datapoint, predicted_page_ids, k, rank_keys):
         evidence_sets = []
         e_size = defaultdict(int)
         for output in datapoint["output"]:
-            e_set = {
-                "+".join([str(provenance[rank_key]).strip() for rank_key in rank_keys])
-                for provenance in output["provenance"]
-            }
+            if "provenance" in output:
+                e_set = {
+                    "+".join([str(provenance[rank_key]).strip() for rank_key in rank_keys])
+                    for provenance in output["provenance"]
+                }
             if e_set not in evidence_sets:  # no duplicate evidence set
                 evidence_sets.append(e_set)
                 e_size[len(e_set)] += 1
