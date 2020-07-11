@@ -33,6 +33,7 @@ python scripts/evaluate_ranking.py -m {dpr/kilt/drqa}
         {
             'wikipedia_id': ,  # *mandatory* - ID Wikipedia Page
             'title': , # Title Wikipedia Page
+            'section': , # Section Wikipedia Page
             'start_paragraph_id': , # start paragraph id with relevant info
             'start_character': , 
             'end_paragraph_id': ,  # end paragraph id
