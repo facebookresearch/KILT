@@ -42,9 +42,9 @@ def get_rank(datapoint, predicted_page_ids, k, rank_keys):
                     "+".join([str(provenance[rank_key]).strip() for rank_key in rank_keys])
                     for provenance in output["provenance"]
                 }
-            if e_set not in evidence_sets:  # no duplicate evidence set
-                evidence_sets.append(e_set)
-                e_size[len(e_set)] += 1
+                if e_set not in evidence_sets:  # no duplicate evidence set
+                    evidence_sets.append(e_set)
+                    e_size[len(e_set)] += 1
         num_distinct_evidence_sets = len(evidence_sets)
 
         # 2. check what's the minimum number of predicted pages needed to get a robust P/R@k
@@ -154,6 +154,7 @@ def meanAvgPrecision(datapoint, predicted_page_ids, topk=100):
 
 
 def _computeRprec(gold_wikipedia_ids, predicted_page_ids):
+    
     R = len(gold_wikipedia_ids)
     num = 0
 
@@ -161,7 +162,7 @@ def _computeRprec(gold_wikipedia_ids, predicted_page_ids):
         if str(prediction).strip() in gold_wikipedia_ids:
             num += 1
 
-    Rprec = num / R
+    Rprec = num / R if R > 0 else 0
     return Rprec
 
 
