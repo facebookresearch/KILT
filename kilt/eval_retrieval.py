@@ -39,7 +39,9 @@ def get_rank(datapoint, predicted_page_ids, k, rank_keys):
         for output in datapoint["output"]:
             if "provenance" in output:
                 e_set = {
-                    "+".join([str(provenance[rank_key]).strip() for rank_key in rank_keys])
+                    "+".join(
+                        [str(provenance[rank_key]).strip() for rank_key in rank_keys]
+                    )
                     for provenance in output["provenance"]
                 }
                 if e_set not in evidence_sets:  # no duplicate evidence set
@@ -154,7 +156,7 @@ def meanAvgPrecision(datapoint, predicted_page_ids, topk=100):
 
 
 def _computeRprec(gold_wikipedia_ids, predicted_page_ids):
-    
+
     R = len(gold_wikipedia_ids)
     num = 0
 
