@@ -60,9 +60,9 @@ def get_rank(datapoint, predicted_page_ids, k, rank_keys):
                 break
         # if the number of evidence sets is smaller than k
         min_prediction_size += k - c
-        assert (
-            len(predicted_page_ids) >= min_prediction_size
-        ), f"you should provide at least {min_prediction_size} predicted pages for a robust recall@{k} computation"
+        
+        if len(predicted_page_ids) >= min_prediction_size:
+            print(f"WARNING: you should provide at least {min_prediction_size} predicted pages for a robust recall@{k} computation. datapoint:", datapoint, "-- predicted_page_ids:", predicted_page_ids)
 
         # 3. rank by gruping pages in each evidence set (each evidence set count as 1),
         # the position in the rank of each evidence set is given by the last page in predicted_page_ids
