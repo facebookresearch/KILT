@@ -9,6 +9,8 @@
 | [Natural Questions](https://ai.google.com/research/NaturalQuestions) | Open Domain QA | [nq-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/nq-train-kilt.jsonl) (87,372 lines, 50MB) | [nq-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/nq-dev-kilt.jsonl) (2,837 lines, 8MB) | nq-test_input-kilt.jsonl (1,444 lines) | 
 | [HotpotQA](https://hotpotqa.github.io) | Open Domain QA | [hotpotqa-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/hotpotqa-train-kilt.jsonl) (88,869 lines, 51MB) | [hotpotqa-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/hotpotqa-dev-kilt.jsonl) (5,600 lines, 4MB) | hotpotqa-test_input-kilt.jsonl (5,569 lines) |
 | [TriviaQA](http://nlp.cs.washington.edu/triviaqa) | Open Domain QA | triviaqa-train_id-kilt.jsonl | triviaqa-dev_id-kilt.jsonl | triviaqa-test_id_input-kilt.jsonl |
+| [ELI5](https://facebookresearch.github.io/ELI5/explore.html) | Open Domain QA | [eli5-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/eli5-train-kilt.jsonl) (272,634 lines, 523MB) | [eli5-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/eli5-dev-kilt.jsonl) (1,947 lines, 18MB) | eli5-test_input-kilt.jsonl (1,040 lines) | 
+
  
 
 ### setup the env
