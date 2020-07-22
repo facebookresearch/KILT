@@ -5,7 +5,7 @@
 
 | dataset | task | train | dev |
 | ------------- | ------------- | ------------- | ------------- | 
-| [FEVER](https://fever.ai) | Fact Checking | fever-train-kilt.jsonl (104,966 lines, 38MB)  | fever-dev-kilt.jsonl (10,444 lines, 6MB) | 
+| [FEVER](https://fever.ai) | Fact Checking | [fever-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-train-kilt.jsonl) (104,966 lines, 38MB)  | [fever-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-train-kilt.jsonl) (10,444 lines, 6MB) | 
 
 
 
