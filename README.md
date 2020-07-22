@@ -3,12 +3,13 @@
 <img align="middle" src="img/KILT.jpg" height="256" alt="KILT">
 
 
-| dataset | task | train | dev |
+| dataset | task | train | dev | test |
 | ------------- | ------------- | ------------- | ------------- | 
-| [FEVER](https://fever.ai) | Fact Checking | [fever-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-train-kilt.jsonl) (104,966 lines, 38MB)  | [fever-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-dev-kilt.jsonl) (10,444 lines, 6MB) | 
-| [Natural Questions](https://ai.google.com/research/NaturalQuestions) | Open Domain QA | [nq-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/nq-train-kilt.jsonl) (87,372 lines, 50MB) | [nq-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/nq-dev-kilt.jsonl) (2,837 lines, 8MB) | 
-| [HotpotQA](https://hotpotqa.github.io) | Open Domain QA | [hotpotqa-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/hotpotqa-train-kilt.jsonl) (88,869 lines, 51MB) | [hotpotqa-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/hotpotqa-dev-kilt.jsonl) (5,600 lines, 4MB) | 
-
+| [FEVER](https://fever.ai) | Fact Checking | [fever-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-train-kilt.jsonl) (104,966 lines, 38MB)  | [fever-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-dev-kilt.jsonl) (10,444 lines, 6MB) | fever-test_input-kilt.jsonl (10,100 lines) | 
+| [Natural Questions](https://ai.google.com/research/NaturalQuestions) | Open Domain QA | [nq-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/nq-train-kilt.jsonl) (87,372 lines, 50MB) | [nq-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/nq-dev-kilt.jsonl) (2,837 lines, 8MB) | nq-test_input-kilt.jsonl (1,444 lines) | 
+| [HotpotQA](https://hotpotqa.github.io) | Open Domain QA | [hotpotqa-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/hotpotqa-train-kilt.jsonl) (88,869 lines, 51MB) | [hotpotqa-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/hotpotqa-dev-kilt.jsonl) (5,600 lines, 4MB) | hotpotqa-test_input-kilt.jsonl (5,569 lines) |
+| [TriviaQA](http://nlp.cs.washington.edu/triviaqa) | Open Domain QA | triviaqa-train_id-kilt.jsonl | triviaqa-dev_id-kilt.jsonl | triviaqa-test_id_input-kilt.jsonl |
+ 
 
 ### setup the env
 
