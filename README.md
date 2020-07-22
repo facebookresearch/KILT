@@ -17,6 +17,7 @@ pip install -r requirements.txt
 ```bash
 mkdir data
 python scripts/donwload_all_kilt_data.py
+python scripts/get_triviaqa_input.py
 ```
 
 ### KILT catalogue
