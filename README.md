@@ -15,6 +15,7 @@
 | [AIDA CoNLL-YAGO](https://www.mpi-inf.mpg.de/departments/databases-and-information-systems/research/ambiverse-nlu/aida/downloads) | Entity Linking | [aidayago2-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/aidayago2-train-kilt.jsonl)<br>(18,395 lines, 67MB) | [aidayago2-dev-kilt.jsonl]( http://dl.fbaipublicfiles.com/KILT/aidayago2-dev-kilt.jsonl)<br>(4,784 lines, 21MB) | aidayago2-test_input-kilt.jsonl<br>(4,463 lines) | 
 | [WNED-WIKI](https://github.com/U-Alberta/wned) | Entity Linking | - | [wned-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/wned-dev-kilt.jsonl)<br>(3,396 lines, 13MB) | wned-test_input-kilt.jsonl<br>(3,376 lines) | 
 | [WNED-CWEB](https://github.com/U-Alberta/wned) | Entity Linking | - | [cweb-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/cweb-dev-kilt.jsonl)<br>(5,599 lines, 87MB)  | cweb-test_input-kilt.jsonl<br>(5,543 lines) | 
+| [Wizard of Wikipedia](https://parl.ai/projects/wizard_of_wikipedia) | Dialogue | [wow-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/wow-train-kilt.jsonl)<br>(107,513 lines, 74MB) | [wow-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/wow-dev-kilt.jsonl)(3,420 lines, 3MB) | wow-test_input-kilt.jsonl<br>(3,322 lines)|
  
 
 ### setup the env
