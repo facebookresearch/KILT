@@ -3,6 +3,24 @@
 <img align="middle" src="img/KILT.jpg" height="256" alt="KILT">
 
 
+## Get KILT data
+
+### setup the env
+
+```bash
+conda create -n kilt37 -y python=3.7 && conda activate kilt37
+pip install -r requirements.txt
+```
+
+### download the data
+
+```bash
+mkdir data
+python scripts/donwload_all_kilt_data.py
+```
+
+### KILT catalogue
+
 | dataset | task | train | dev | test |
 | ------------- | ------------- | ------------- | ------------- | ------------- | 
 | [FEVER](https://fever.ai) | Fact Checking | [fever-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-train-kilt.jsonl)<br>(104,966 lines, 38.9MiB)  | [fever-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-dev-kilt.jsonl)<br>(10,444 lines, 6.17MiB) | [fever-test_without_answers-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-test_without_answers-kilt.jsonl)<br>(10,100 lines, 839kiB) | 
@@ -18,13 +36,6 @@
 | [Wizard of Wikipedia](https://parl.ai/projects/wizard_of_wikipedia) | Dialogue | [wow-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/wow-train-kilt.jsonl)<br>(94,577 lines, 71.9MiB) | [wow-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/wow-dev-kilt.jsonl)<br>(3,058 lines, 2.42MiB) | [wow-test_without_answers-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/wow-test_without_answers-kilt.jsonl)<br>(2,944 lines, 1.29MiB)|
  
 
-### setup the env
-
-```bash
-conda create -n kilt37 -y python=3.7 && conda activate kilt37
-pip install -r requirements.txt
-python -m spacy download en_core_web_sm
-```
 
 ## Run the retrieval evaluation
 
