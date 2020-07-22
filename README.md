@@ -2,6 +2,13 @@
 
 <img align="middle" src="img/KILT.jpg" height="256" alt="KILT">
 
+
+| dataset | task | train | dev |
+| ------------- | ------------- | ------------- | ------------- | 
+| [FEVER](https://fever.ai) | Fact Checking | fever-train-kilt.jsonl (104,966 lines, 38MB)  | fever-dev-kilt.jsonl (10,444 lines, 6MB) | 
+
+
+
 ### setup the env
 
 ```bash
