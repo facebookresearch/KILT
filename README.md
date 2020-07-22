@@ -36,7 +36,7 @@ python scripts/get_triviaqa_input.py
 | [WNED-CWEB](https://github.com/U-Alberta/wned) | Entity Linking | - | [cweb-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/cweb-dev-kilt.jsonl)<br>(5,599 lines, 90.2MiB)  | [cweb-test_without_answers-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/cweb-test_without_answers-kilt.jsonl)<br>(5,543 lines, 100MiB) | 
 | [Wizard of Wikipedia](https://parl.ai/projects/wizard_of_wikipedia) | Dialogue | [wow-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/wow-train-kilt.jsonl)<br>(94,577 lines, 71.9MiB) | [wow-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/wow-dev-kilt.jsonl)<br>(3,058 lines, 2.42MiB) | [wow-test_without_answers-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/wow-test_without_answers-kilt.jsonl)<br>(2,944 lines, 1.29MiB)|
  
-<sup>*</sup> run `python scripts/get_triviaqa_input.py` to get the input
+<sup>*</sup> run `python scripts/get_triviaqa_input.py` to get the question associated with each id
 
 
 ## Run the retrieval evaluation
