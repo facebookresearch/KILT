@@ -5,7 +5,7 @@
 
 | dataset | task | train | dev | test |
 | ------------- | ------------- | ------------- | ------------- | ------------- | 
-| [FEVER](https://fever.ai) | Fact Checking | [fever-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-train-kilt.jsonl)<br>(104,966 lines, 38MB)  | [fever-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-dev-kilt.jsonl) (10,444 lines, 6MB) | fever-test_input-kilt.jsonl<br>(10,100 lines) | 
+| [FEVER](https://fever.ai) | Fact Checking | [fever-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-train-kilt.jsonl)<br>(104,966 lines, 38MB)  | [fever-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/fever-dev-kilt.jsonl)<br>(10,444 lines, 6MB) | fever-test_input-kilt.jsonl<br>(10,100 lines) | 
 | [Natural Questions](https://ai.google.com/research/NaturalQuestions) | Open Domain QA | [nq-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/nq-train-kilt.jsonl)<br>(87,372 lines, 50MB) | [nq-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/nq-dev-kilt.jsonl)<br>(2,837 lines, 8MB) | nq-test_input-kilt.jsonl<br>(1,444 lines) | 
 | [HotpotQA](https://hotpotqa.github.io) | Open Domain QA | [hotpotqa-train-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/hotpotqa-train-kilt.jsonl)<br>(88,869 lines, 51MB) | [hotpotqa-dev-kilt.jsonl](http://dl.fbaipublicfiles.com/KILT/hotpotqa-dev-kilt.jsonl)<br>(5,600 lines, 4MB) | hotpotqa-test_input-kilt.jsonl<br>(5,569 lines) |
 | [TriviaQA](http://nlp.cs.washington.edu/triviaqa) | Open Domain QA | triviaqa-train_id-kilt.jsonl | triviaqa-dev_id-kilt.jsonl | triviaqa-test_id_input-kilt.jsonl |
