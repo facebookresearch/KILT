@@ -1,22 +1,26 @@
 import argparse
+import pprint
 from collections import defaultdict
 
 from kilt import kilt_utils
 from kilt import eval_downstream
 
 
-def _get_gold_ids_list(datapoint):
+def _get_gold_ids_list(datapoint, rank_keys):
     # collect all gold ids
     gold_wikipedia_ids_list = []
     for output in datapoint["output"]:
         single_wikipedia_ids_list = []
         if "provenance" in output:
             for provenance in output["provenance"]:
-                single_wikipedia_ids_list.append(str(provenance["wikipedia_id"]))
+                single_wikipedia_ids_list.append(
+                    "+".join(
+                        [str(provenance[rank_key]).strip() for rank_key in rank_keys]
+                    )
+                )
         gold_wikipedia_ids_list.append(list(set(single_wikipedia_ids_list)))
 
     # consider only unique ids
-
     return gold_wikipedia_ids_list
 
 
@@ -62,9 +66,11 @@ def get_rank(datapoint, predicted_page_ids, k, rank_keys):
                 break
         # if the number of evidence sets is smaller than k
         min_prediction_size += k - c
-        
-        if len(predicted_page_ids) >= min_prediction_size:
-            print(f"WARNING: you should provide at least {min_prediction_size} predicted pages for a robust recall@{k} computation. datapoint:", datapoint, "-- predicted_page_ids:", predicted_page_ids)
+
+        if len(predicted_page_ids) < min_prediction_size:
+            print(
+                f"WARNING: you should provide at least {min_prediction_size} provenance items for a robust recall@{k} computation (you provided {len(predicted_page_ids)} item(s))."
+            )
 
         # 3. rank by gruping pages in each evidence set (each evidence set count as 1),
         # the position in the rank of each evidence set is given by the last page in predicted_page_ids
@@ -100,9 +106,8 @@ def get_rank(datapoint, predicted_page_ids, k, rank_keys):
     return rank, num_distinct_evidence_sets
 
 
-def precision_at_k(datapoint, predicted_page_ids, k, rank_keys):
-
-    rank, _ = get_rank(datapoint, predicted_page_ids, k, rank_keys=rank_keys)
+# 1. Precision computation
+def _precision_at_k(rank, k):
 
     # precision @ k
     p = rank[:k].count(True) / k
@@ -110,49 +115,21 @@ def precision_at_k(datapoint, predicted_page_ids, k, rank_keys):
     return p
 
 
-def recall_at_k(datapoint, predicted_page_ids, k, rank_keys):
+# 2. Recall computation
+def _recall_at_k(rank, num_distinct_evidence_sets, k):
 
-    rank, num_distinct_evidence_sets = get_rank(
-        datapoint, predicted_page_ids, k, rank_keys=rank_keys
-    )
-
-    r = 0
-
-    if num_distinct_evidence_sets > 0:
-        # recall @ k
-        r = rank[:k].count(True) / num_distinct_evidence_sets
-    else:
-        print("WARNING: the number of distinct evidence sets is 0 for", datapoint)
+    r = rank[:k].count(True) / num_distinct_evidence_sets
 
     return r
 
 
-def _computeMAP(gold_wikipedia_ids, predicted_page_ids, topk):
-    # Mean Average Precision
-    rate_num = 0.0
-    rate_den = 0.0
-    MAP = 0.0
-    for prediction in predicted_page_ids:
-        rate_den += 1
-        if prediction in gold_wikipedia_ids:
-            rate_num += 1
-            # fraction of relevant documents so far
-            MAP += rate_num / rate_den
+# 3. Success rate computation
+def _success_rate_at_k(rank, k):
 
-    # less than topk relevant documents could be available
-    MAP /= min(topk, len(gold_wikipedia_ids))
+    # success rate @ k
+    p = int(True in rank[:k])
 
-    return MAP
-
-
-def meanAvgPrecision(datapoint, predicted_page_ids, topk=100):
-    # return the maximum value among all the possible answer's provenance list
-    gold_wikipedia_ids_list = _get_gold_ids_list(datapoint)
-    MAP_vector = []
-    for gold_wikipedia_ids in gold_wikipedia_ids_list:
-        MAP = _computeMAP(gold_wikipedia_ids, predicted_page_ids, topk)
-        MAP_vector.append(MAP)
-    return max(MAP_vector)
+    return p
 
 
 def _computeRprec(gold_wikipedia_ids, predicted_page_ids):
@@ -169,9 +146,9 @@ def _computeRprec(gold_wikipedia_ids, predicted_page_ids):
 
 
 # R-precision https://link.springer.com/referenceworkentry/10.1007%2F978-0-387-39940-9_486
-def rprecision(datapoint, predicted_page_ids):
+def rprecision(datapoint, predicted_page_ids, rank_keys):
 
-    gold_wikipedia_ids_list = _get_gold_ids_list(datapoint)
+    gold_wikipedia_ids_list = _get_gold_ids_list(datapoint, rank_keys)
     Rprec_vector = []
     for gold_wikipedia_ids in gold_wikipedia_ids_list:
         Rprec = _computeRprec(gold_wikipedia_ids, predicted_page_ids)
@@ -190,8 +167,9 @@ def remove_duplicates(obj):
 def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
 
     Rprec = 0
-    R_at_k = {"recall@{}".format(k): 0 for k in ks}
-    P_at_k = {"precision@{}".format(k): 0 for k in ks}
+    P_at_k = {"precision@{}".format(k): 0 for k in sorted(ks) if k > 0}
+    R_at_k = {"recall@{}".format(k): 0 for k in sorted(ks) if k > 1}
+    S_at_k = {"success_rate@{}".format(k): 0 for k in sorted(ks) if k > 1}
 
     assert (
         "output" in guess_item and len(guess_item["output"]) == 1
@@ -203,10 +181,11 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
     if "provenance" in output:
         for provenance in output["provenance"]:
             if any(rank_key not in provenance for rank_key in rank_keys):
+                missing = set(rank_keys) - set(list(provenance.keys())).intersection(
+                    set(rank_keys)
+                )
                 print(
-                    "one or more rank keys not in provenance for-> {}\n skipping".format(
-                        provenance
-                    )
+                    f"WARNING: missing key(s) {missing} in provenance, unable to compute retrieval for those."
                 )
             else:
                 guess_wikipedia_ids.append(
@@ -218,23 +197,49 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
     guess_wikipedia_ids = remove_duplicates(guess_wikipedia_ids)
 
     if len(guess_wikipedia_ids) > 0:
-        Rprec = rprecision(gold_item, guess_wikipedia_ids)
+        Rprec = rprecision(gold_item, guess_wikipedia_ids, rank_keys=rank_keys)
         for k in ks:
-            R_at_k["recall@{}".format(k)] = recall_at_k(
-                gold_item, guess_wikipedia_ids, k, rank_keys,
-            )
-            P_at_k["precision@{}".format(k)] = precision_at_k(
-                gold_item, guess_wikipedia_ids, k, rank_keys,
+
+            # 0. get rank
+            rank, num_distinct_evidence_sets = get_rank(
+                gold_item, guess_wikipedia_ids, k, rank_keys=rank_keys
             )
 
-    return {"Rprec": Rprec, **R_at_k, **P_at_k}
+            if num_distinct_evidence_sets > 0:
+
+                # 1. precision
+                P_at_k["precision@{}".format(k)] = _precision_at_k(rank, k)
+
+                # 2. recall
+                R_at_k["recall@{}".format(k)] = _recall_at_k(
+                    rank, num_distinct_evidence_sets, k
+                )
+
+                # 3. success rate
+                S_at_k["success_rate@{}".format(k)] = _success_rate_at_k(rank, k)
+
+            else:
+                print(
+                    "WARNING: the number of distinct evidence sets is 0 for {}".format(
+                        gold_item
+                    )
+                )
+
+    return {"Rprec": Rprec, **P_at_k, **R_at_k, **S_at_k}
 
 
 def compute(gold_dataset, guess_dataset, ks, rank_keys):
 
-    Rprec = 0.0
-    R_at_k = {"recall@{}".format(k): 0 for k in ks}
-    P_at_k = {"precision@{}".format(k): 0 for k in ks}
+    ks = sorted([int(x) for x in ks])
+
+    result = {}
+    result["Rprec"] = 0.0
+    for k in ks:
+        if k > 0:
+            result["precision@{}".format(k)] = 0.0
+        if k > 1:
+            result["recall@{}".format(k)] = 0.0
+            result["success_rate@{}".format(k)] = 0.0
 
     assert len(guess_dataset) == len(
         gold_dataset
@@ -247,20 +252,46 @@ def compute(gold_dataset, guess_dataset, ks, rank_keys):
 
     for guess_item, gold_item in zip(guess_dataset, gold_dataset):
         ranking_metrics = get_ranking_metrics(guess_item, gold_item, ks, rank_keys)
-        Rprec += ranking_metrics["Rprec"]
+        result["Rprec"] += ranking_metrics["Rprec"]
         for k in ks:
-            R_at_k["recall@{}".format(k)] += ranking_metrics["recall@{}".format(k)]
-            P_at_k["precision@{}".format(k)] += ranking_metrics[
-                "precision@{}".format(k)
-            ]
+            if k > 0:
+                result["precision@{}".format(k)] += ranking_metrics[
+                    "precision@{}".format(k)
+                ]
+            if k > 1:
+                result["recall@{}".format(k)] += ranking_metrics["recall@{}".format(k)]
+                result["success_rate@{}".format(k)] += ranking_metrics[
+                    "success_rate@{}".format(k)
+                ]
 
     if len(guess_dataset) > 0:
-        Rprec /= len(guess_dataset)
+        result["Rprec"] /= len(guess_dataset)
         for k in ks:
-            R_at_k["recall@{}".format(k)] /= len(guess_dataset)
-            P_at_k["precision@{}".format(k)] /= len(guess_dataset)
+            if k > 0:
+                result["precision@{}".format(k)] /= len(guess_dataset)
+            if k > 1:
+                result["recall@{}".format(k)] /= len(guess_dataset)
+                result["success_rate@{}".format(k)] /= len(guess_dataset)
 
-    return {"Rprec": Rprec, **R_at_k, **P_at_k}
+    return result
+
+
+def evaluate(gold, guess, ks, rank_keys):
+    pp = pprint.PrettyPrinter(indent=4)
+
+    gold_dataset = kilt_utils.load_data(gold)
+    guess_dataset = kilt_utils.load_data(guess)
+
+    # 0. validate input
+    gold_dataset, guess_dataset = eval_downstream.validate_input(
+        gold_dataset, guess_dataset
+    )
+
+    # 1. get retrieval metrics
+    result = compute(gold_dataset, guess_dataset, ks, rank_keys)
+
+    pp.pprint(result)
+    return result
 
 
 if __name__ == "__main__":
@@ -286,12 +317,4 @@ if __name__ == "__main__":
     args.ks = [int(k) for k in args.ks.split(",")]
     args.rank_keys = [rank_key for rank_key in args.rank_keys.split(",")]
 
-    gold_dataset = kilt_utils.load_data(args.gold)
-    guess_dataset = kilt_utils.load_data(args.guess)
-
-    # 0. validate input
-    gold_dataset, guess_dataset = eval_downstream.validate_input(
-        gold_dataset, guess_dataset
-    )
-
-    print(compute(gold_dataset, guess_dataset, args.ks, args.rank_keys))
+    evaluate(args.gold, args.guess, args.ks, args.rank_keys)

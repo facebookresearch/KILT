@@ -5,13 +5,14 @@ import pprint
 import re
 import string
 import sys
+from rouge import Rouge
 
 from collections import Counter
 
 import kilt.eval_retrieval as retrieval_metrics
 from kilt import kilt_utils
 
-
+# utility to get gold answers
 def get_gold_answers(gold):
     ground_truths = set()
     for item in gold["output"]:
@@ -20,31 +21,8 @@ def get_gold_answers(gold):
     return ground_truths
 
 
-def exact_match(guess_dataset, gold_dataset):
-    """
-    Calculate exact match score between two datasets.
-
-    Args:
-        guess_data_set (list of KILT json data): The KILT instances to compare against the gold data
-        gold_data_set (list of KILT json data): The KILT instances to compare against the guess data.
-    """
-    total_count = 0
-    total_matches = 0
-    for guess_item, gold_item in zip(guess_dataset, gold_dataset):
-        total_count += 1
-        # check if each output of guess file exist in set of candidate answers
-        gold_candidate_answers = get_gold_answers(gold_item)
-
-        guess_candidate_answers = set(item["answer"] for item in guess_item["output"])
-        if all(x in gold_candidate_answers for x in guess_candidate_answers):
-            total_matches += 1
-    result = 0
-    if total_count > 0:
-        result = total_matches / total_count
-    return result
-
-
-def metric_max_over_ground_truths(metric_fn, prediction, ground_truths):
+# utility to get max
+def _metric_max_over_ground_truths(metric_fn, prediction, ground_truths):
     scores_for_ground_truths = []
     for ground_truth in ground_truths:
         score = metric_fn(prediction, ground_truth)
@@ -52,80 +30,7 @@ def metric_max_over_ground_truths(metric_fn, prediction, ground_truths):
     return max(scores_for_ground_truths)
 
 
-def qa_exact_match(guess_dataset, gold_dataset):
-    total = 0
-    total_em = 0
-    for guess, gold in zip(guess_dataset, gold_dataset):
-        if len(gold["output"]) == 0:
-            raise Exception("bad gold")
-
-        ground_truths = get_gold_answers(gold)
-
-        total_em += metric_max_over_ground_truths(
-            exact_match_score_qa, guess["output"][0]["answer"], ground_truths
-        )
-        total += 1
-    result = 0
-    if total > 0:
-        result = total_em / total
-    return result
-
-
-def kilt_qa_exact_match(guess_dataset, gold_dataset):
-    total = 0
-    total_em = 0
-    for guess, gold in zip(guess_dataset, gold_dataset):
-        ranking_metrics = retrieval_metrics.get_ranking_metrics(
-            guess, gold, ks=[], rank_keys=["wikipedia_id"]
-        )
-        if ranking_metrics["Rprec"] == 1:
-            ground_truths = get_gold_answers(gold)
-            total_em += metric_max_over_ground_truths(
-                exact_match_score_qa, guess["output"][0]["answer"], ground_truths
-            )
-        total += 1
-    result = 0
-    if total > 0:
-        result = total_em / total
-    return result
-
-
-def qa_f1(guess_dataset, gold_dataset):
-    total = 0
-    total_f1 = 0
-    for guess, gold in zip(guess_dataset, gold_dataset):
-        if len(gold["output"]) == 0:
-            raise Exception("bad gold")
-        ground_truths = get_gold_answers(gold)
-        total_f1 += metric_max_over_ground_truths(
-            f1_score, guess["output"][0]["answer"], ground_truths
-        )
-        total += 1
-    result = 0
-    if total > 0:
-        result = total_f1 / total
-    return result
-
-
-def kilt_qa_f1(guess_dataset, gold_dataset):
-    total = 0
-    total_em = 0
-    for guess, gold in zip(guess_dataset, gold_dataset):
-        ranking_metrics = retrieval_metrics.get_ranking_metrics(
-            guess, gold, ks=[], rank_keys=["wikipedia_id"]
-        )
-        if ranking_metrics["Rprec"] == 1:
-            ground_truths = get_gold_answers(gold)
-            total_em += metric_max_over_ground_truths(
-                f1_score, guess["output"][0]["answer"], ground_truths
-            )
-        total += 1
-    result = 0
-    if total > 0:
-        result = total_em / total
-    return result
-
-
+# QA answer nomalization
 def normalize_answer(s):
     """Lower text and remove punctuation, articles and extra whitespace."""
 
@@ -145,7 +50,8 @@ def normalize_answer(s):
     return white_space_fix(remove_articles(remove_punc(lower(s))))
 
 
-def f1_score(prediction, ground_truth):
+# F1 score definition
+def __f1_score(prediction, ground_truth):
     if not prediction:
         # print("WARNING: Null prediction")
         return 0.0
@@ -161,45 +67,110 @@ def f1_score(prediction, ground_truth):
     return f1
 
 
-def exact_match_score_qa(prediction, ground_truth):
+# EM score definition
+def __exact_match_score_qa(prediction, ground_truth):
     if not prediction:
-        #  print("WARNING: Null prediction")
         return 0.0
     return normalize_answer(prediction) == normalize_answer(ground_truth)
 
 
-def calculate_metrics(gold_records, guess_records):
+# ROUGEL score definition
+def __rougel_score(prediction, ground_truth):
+    if not prediction:
+        return 0.0
+    rouge = Rouge()
+    scores = rouge.get_scores(
+        normalize_answer(prediction), normalize_answer(ground_truth), avg=True
+    )
+    return scores["rouge-l"]["f"]
+
+
+def _calculate_metrics(gold_records, guess_records):
 
     assert len(gold_records) == len(
         guess_records
     ), "different size gold: {} guess: {}".format(len(gold_records), len(guess_records))
 
-    for gold, guess in zip(gold_records, guess_records):
+    total_count = 0
+
+    # downstream metrics
+    strict_em = 0
+    normalized_em = 0
+    normalized_f1 = 0
+    rougel = 0
+
+    # kilt metrics
+    kilt_em = 0
+    kilt_f1 = 0
+    kilt_rougel = 0
+
+    for guess_item, gold_item in zip(guess_records, gold_records):
+
+        # check ids
         assert (
-            str(gold["id"]).strip() == str(guess["id"]).strip()
+            str(gold_item["id"]).strip() == str(guess_item["id"]).strip()
         ), "Items must have same order with same IDs"
 
+        total_count += 1
+        # check if each output of guess file exist in set of candidate answers
+        gold_candidate_answers = get_gold_answers(gold_item)
+
+        assert len(guess_item["output"]) == 1, "you should provide a single answer"
+
+        if "answer" in guess_item["output"][0]:
+            guess_answer = guess_item["output"][0]["answer"]
+        else:
+            # no answer provided
+            continue
+
+        # 0. strict exact match
+        if guess_answer in gold_candidate_answers:
+            strict_em += 1
+
+        # 1. qa normalized exact match
+        local_em = _metric_max_over_ground_truths(
+            __exact_match_score_qa, guess_answer, gold_candidate_answers
+        )
+        normalized_em += local_em
+
+        # 2. normalized f1
+        local_f1 = _metric_max_over_ground_truths(
+            __f1_score, guess_answer, gold_candidate_answers
+        )
+        normalized_f1 += local_f1
+
+        # 3. rougel
+        local_rougel = _metric_max_over_ground_truths(
+            __rougel_score, guess_answer, gold_candidate_answers
+        )
+        rougel += local_rougel
+
+        # KILT-metrics
+        ranking_metrics = retrieval_metrics.get_ranking_metrics(
+            guess_item, gold_item, ks=[], rank_keys=["wikipedia_id"]
+        )
+        if ranking_metrics["Rprec"] == 1:
+            # 1. KILT-em
+            kilt_em += local_em
+
+            # 2. KILT-f1
+            kilt_f1 += local_f1
+
+            # 3. KILT-rougel
+            kilt_rougel += local_rougel
+
+    if total_count > 0:
+        strict_em /= total_count
+        normalized_em /= total_count
+        normalized_f1 /= total_count
+        rougel /= total_count
+        kilt_em /= total_count
+        kilt_f1 /= total_count
+        kilt_rougel /= total_count
+
     return {
-        "em": exact_match(guess_records, gold_records),
-        "em_qa": qa_exact_match(guess_records, gold_records),
-        "f1_qa": qa_f1(guess_records, gold_records),
-    }
-
-
-def calculate_kilt_metrics(gold_records, guess_records):
-
-    assert len(gold_records) == len(
-        guess_records
-    ), "different size gold: {} guess: {}".format(len(gold_records), len(guess_records))
-
-    for gold, guess in zip(gold_records, guess_records):
-        assert (
-            str(gold["id"]).strip() == str(guess["id"]).strip()
-        ), "Items must have same order with same IDs"
-
-    return {
-        "kilt_em": kilt_qa_exact_match(guess_records, gold_records),
-        "kilt_f1": kilt_qa_f1(guess_records, gold_records),
+        "kilt": {"KILT-em": kilt_em, "kilt_f1": kilt_f1, "kilt_rougel": kilt_rougel,},
+        "downstream": {"em": normalized_em, "f1": normalized_f1, "rougel": rougel,},
     }
 
 
@@ -244,30 +215,28 @@ def evaluate(gold, guess):
     # 0. validate input
     gold_records, guess_records = validate_input(gold_records, guess_records)
 
-    # 1. retrieval performance
-    retrieval_result = retrieval_metrics.compute(
-        gold_records, guess_records, ks=[], rank_keys=["wikipedia_id"]
+    # 1. downstream + kilt
+    result = _calculate_metrics(gold_records, guess_records)
+
+    # 2. retrieval performance
+    result["retrieval_page-level"] = retrieval_metrics.compute(
+        gold_records, guess_records, ks=[1, 5], rank_keys=["wikipedia_id"]
     )
-    print("retrieval_result:")
-    pp.pprint(retrieval_result)
-
-    # 2. end2end results
-    e2e_result = calculate_metrics(gold_records, guess_records)
-    print("\ne2e_result:")
-    pp.pprint(e2e_result)
-
-    # 2. KILT Score
-    kilt_result = calculate_kilt_metrics(gold_records, guess_records)
-    print("\nkilt_result:")
-    pp.pprint(kilt_result)
-
-    return (
-        round(retrieval_result["Rprec"] * 100, 2),
-        round(e2e_result["em_qa"] * 100, 2),
-        round(e2e_result["f1_qa"] * 100, 2),
-        round(kilt_result["kilt_em"] * 100, 2),
-        round(kilt_result["kilt_f1"] * 100, 2),
+    result["retrieval_section-level"] = retrieval_metrics.compute(
+        gold_records,
+        guess_records,
+        ks=[1, 5, 20],
+        rank_keys=["wikipedia_id", "section"],
     )
+    result["retrieval_paragraph-level"] = retrieval_metrics.compute(
+        gold_records,
+        guess_records,
+        ks=[1, 5, 20],
+        rank_keys=["wikipedia_id", "start_paragraph_id", "end_paragraph_id"],
+    )
+
+    pp.pprint(result)
+    return result
 
 
 if __name__ == "__main__":
