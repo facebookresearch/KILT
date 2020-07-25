@@ -3,7 +3,7 @@
 <img align="middle" src="img/KILT.jpg" height="256" alt="KILT">
 
 
-## Get KILT data
+## KILT data
 
 ### setup the env
 
@@ -67,26 +67,34 @@ python scripts/get_triviaqa_input.py
 <sup>*</sup> run `python scripts/get_triviaqa_input.py` to get the question associated with each id
 
 
-## Get KILT knowledge source
+## KILT knowledge source
 
-The KILT knowledge source based on the [2019/08/01 Wikipedia dump](http://dl.fbaipublicfiles.com/BLINK/enwiki-pages-articles.xml.bz2).
-[kilt_knowledgesource.json](http://dl.fbaipublicfiles.com/KILT/kilt_knowledgesource.json)
+The KILT knowledge source can be downloaded here: [kilt_knowledgesource.json](http://dl.fbaipublicfiles.com/KILT/kilt_knowledgesource.json).<br>
+It is based on the [2019/08/01 Wikipedia dump](http://dl.fbaipublicfiles.com/BLINK/enwiki-pages-articles.xml.bz2).<br>
+We use [mongoDB](https://www.mongodb.com) to index the knowledge base (but you can use any json-based db).
+To import the knowledge source in mongoDB run:
 
-
-## Run the retrieval evaluation
-
-Setup retrievers following [this README](kilt/retrievers/README.md)
-
-run the evaluation
 ```bash
-export PYTHONPATH=.
-python scripts/evaluate_ranking.py -m {dpr/kilt/drqa}
+wget http://dl.fbaipublicfiles.com/KILT/kilt_knowledgesource.json
+mongoimport --db kilt --collection knowledgesource --file kilt_knowledgesource.json
 ```
 
 
+### Structure of each record
 
+```python
+{
+ 'wikipedia_title': 'Email marketing',
+ 'wikipedia_id': 1101759, 
+ 'text': ['p1', 'p2',...., 'pn'], # list of paragraph text
+ 'anchors': [{"text":,"href":,"paragraph_id":,"start":,"end":} ]  , 
+ 'categories': 'comma separated list of categories'
+ 'history': # some info from wikipedia, including original url
+ 'wikidata_info': # wikidata info
+ }
+```
 
-## Knowledge Source
+### Query the knowledge source
 
 ```python
 from kilt.knowledge_source import KnowledgeSource
@@ -104,16 +112,12 @@ page = ks.get_page_by_id(27097632)
 page = ks.get_page_by_title("Michael Jordan")
 ```
 
+## Run the retrieval evaluation
 
-Structure of each record:
-```python
-{
- 'wikipedia_title': 'Email marketing',
- 'wikipedia_id': 1101759, 
- 'text': ['p1', 'p2',...., 'pn'], # list of paragraph text
- 'anchors': [{"text":,"href":,"paragraph_id":,"start":,"end":} ]  , 
- 'categories': 'comma separated list of categories'
- 'history': # some info from wikipedia, including original url
- 'wikidata_info': # wikidata info
- }
+Setup retrievers following [this README](kilt/retrievers/README.md)
+
+run the evaluation
+```bash
+export PYTHONPATH=.
+python scripts/evaluate_ranking.py -m {dpr/kilt/drqa}
 ```
