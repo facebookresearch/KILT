@@ -2,6 +2,14 @@
 
 <img align="middle" src="img/KILT.jpg" height="256" alt="KILT">
 
+
+## Setup the env
+
+```bash
+conda create -n kilt37 -y python=3.7 && conda activate kilt37
+pip install -r requirements.txt
+```
+
 ## KILT knowledge source
 
 The KILT knowledge source can be downloaded here: [kilt_knowledgesource.json](http://dl.fbaipublicfiles.com/KILT/kilt_knowledgesource.json).<br>
@@ -49,13 +57,6 @@ page = ks.get_page_by_title("Michael Jordan")
 
 
 ## KILT data
-
-### setup the env
-
-```bash
-conda create -n kilt37 -y python=3.7 && conda activate kilt37
-pip install -r requirements.txt
-```
 
 ### download the data
 
