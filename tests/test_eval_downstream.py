@@ -12,12 +12,34 @@ class TestEvalDownstream(unittest.TestCase):
         with importlib.resources.open_text(test_data, "gold1.out") as gold_file:
             with importlib.resources.open_text(test_data, "guess1_1.out") as guess_file:
                 result = kilt.eval_downstream.evaluate(gold_file.name, guess_file.name)
+
+                # kilt
+                self.assertEqual(result["kilt"]["KILT-em"], 1 / 3)
+                self.assertEqual(result["kilt"]["KILT-f1"], 1 / 3)
+                self.assertEqual(result["kilt"]["KILT-rougel"], 0.3333333316666667)
+
+                # downsream
                 self.assertEqual(result["downstream"]["em"], 2 / 3)
                 self.assertEqual(result["downstream"]["f1"], 0.8333333333333334)
                 self.assertEqual(result["downstream"]["rougel"], 0.8333333287500001)
 
+                # retrieval page level
+                self.assertEqual(result["retrieval"]["Rprec"], 1 / 3)
+                self.assertEqual(result["retrieval"]["recall@5"], 1 / 3)
+
             with importlib.resources.open_text(test_data, "gold1.out") as guess_file:
                 result = kilt.eval_downstream.evaluate(gold_file.name, guess_file.name)
+
+                # kilt
+                self.assertEqual(result["kilt"]["KILT-em"], 1)
+                self.assertEqual(result["kilt"]["KILT-f1"], 1)
+                self.assertEqual(result["kilt"]["KILT-rougel"], 0.999999995)
+
+                # downsream
                 self.assertEqual(result["downstream"]["em"], 1)
                 self.assertEqual(result["downstream"]["f1"], 1)
                 self.assertEqual(result["downstream"]["rougel"], 0.999999995)
+
+                # retrieval page level
+                self.assertEqual(result["retrieval"]["Rprec"], 1)
+                self.assertEqual(result["retrieval"]["recall@5"], 1)

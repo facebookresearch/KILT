@@ -169,7 +169,7 @@ def _calculate_metrics(gold_records, guess_records):
         kilt_rougel /= total_count
 
     return {
-        "kilt": {"KILT-em": kilt_em, "kilt_f1": kilt_f1, "kilt_rougel": kilt_rougel,},
+        "kilt": {"KILT-em": kilt_em, "KILT-f1": kilt_f1, "KILT-rougel": kilt_rougel,},
         "downstream": {"em": normalized_em, "f1": normalized_f1, "rougel": rougel,},
     }
 
@@ -219,21 +219,13 @@ def evaluate(gold, guess):
     result = _calculate_metrics(gold_records, guess_records)
 
     # 2. retrieval performance
-    result["retrieval_page-level"] = retrieval_metrics.compute(
+    retrieval_results = retrieval_metrics.compute(
         gold_records, guess_records, ks=[1, 5], rank_keys=["wikipedia_id"]
     )
-    result["retrieval_section-level"] = retrieval_metrics.compute(
-        gold_records,
-        guess_records,
-        ks=[1, 5, 20],
-        rank_keys=["wikipedia_id", "section"],
-    )
-    result["retrieval_paragraph-level"] = retrieval_metrics.compute(
-        gold_records,
-        guess_records,
-        ks=[1, 5, 20],
-        rank_keys=["wikipedia_id", "start_paragraph_id", "end_paragraph_id"],
-    )
+    result["retrieval"] = {
+        "Rprec": retrieval_results["Rprec"],
+        "recall@5": retrieval_results["recall@5"],
+    }
 
     pp.pprint(result)
     return result
