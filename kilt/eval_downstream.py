@@ -70,7 +70,10 @@ def _exact_match_score(prediction, ground_truth):
 def _rougel_score(prediction, ground_truth):
     rouge = Rouge()
     # no normalization
-    scores = rouge.get_scores(prediction, ground_truth, avg=True)
+    try:
+        scores = rouge.get_scores(prediction, ground_truth, avg=True)
+    except ValueError:  # "Hypothesis is empty."
+        return 0.0
     return scores["rouge-l"]["f"]
 
 
@@ -104,15 +107,17 @@ def _calculate_metrics(gold_records, guess_records):
         # check if each output of guess file exist in set of candidate answers
         gold_candidate_answers = get_gold_answers(gold_item)
 
-        conditions = (
-            (len(guess_item["output"]) == 1)
-            and ("answer" in guess_item["output"][0])
-            and len(str(guess_item["output"][0]["answer"]).strip()) > 0
+        conditions = (len(guess_item["output"]) == 1) and (
+            "answer" in guess_item["output"][0]
         )
         assert (
             conditions
         ), f"you should provide exactly one valid answer for {guess_item['id']}"
         guess_answer = str(guess_item["output"][0]["answer"]).strip()
+
+        if len(guess_answer) == 0:
+            # empty answer
+            continue
 
         # 0. strict exact match
         if guess_answer in gold_candidate_answers:
