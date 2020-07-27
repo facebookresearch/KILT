@@ -30,7 +30,7 @@ def _metric_max_over_ground_truths(metric_fn, prediction, ground_truths):
     return max(scores_for_ground_truths)
 
 
-# QA answer nomalization
+# answer nomalization
 def normalize_answer(s):
     """Lower text and remove punctuation, articles and extra whitespace."""
 
@@ -65,7 +65,7 @@ def _f1_score(prediction, ground_truth):
 
 
 # EM score definition
-def _exact_match_score_qa(prediction, ground_truth):
+def _exact_match_score(prediction, ground_truth):
     return normalize_answer(prediction) == normalize_answer(ground_truth)
 
 
@@ -121,9 +121,9 @@ def _calculate_metrics(gold_records, guess_records):
         if guess_answer in gold_candidate_answers:
             strict_em += 1
 
-        # 1. qa normalized exact match
+        # 1. normalized exact match
         local_em = _metric_max_over_ground_truths(
-            _exact_match_score_qa, guess_answer, gold_candidate_answers
+            _exact_match_score, guess_answer, gold_candidate_answers
         )
         normalized_em += local_em
 
