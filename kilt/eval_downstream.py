@@ -70,7 +70,10 @@ def _exact_match_score(prediction, ground_truth):
 def _rougel_score(prediction, ground_truth):
     rouge = Rouge()
     # no normalization
-    scores = rouge.get_scores(prediction, ground_truth, avg=True)
+    try:
+        scores = rouge.get_scores(prediction, ground_truth, avg=True)
+    except ValueError: # "Hypothesis is empty."
+        return 0.
     return scores["rouge-l"]["f"]
 
 

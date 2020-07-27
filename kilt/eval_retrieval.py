@@ -43,7 +43,7 @@ def _get_ids_list(datapoint, rank_keys):
     return ids_list
 
 
-def get_rank(guess_item, gold_item, k, rank_keys):
+def get_rank(guess_item, gold_item, k, rank_keys, verbose=False):
     """
     The main idea is to consider each evidence set as a single point in the rank.
     The score in the rank for an evidence set is given by the lowest scored evidence in the set.
@@ -88,7 +88,7 @@ def get_rank(guess_item, gold_item, k, rank_keys):
         # if the number of evidence sets is smaller than k
         min_prediction_size += k - c
 
-        if len(guess_ids) < min_prediction_size:
+        if verbose and len(guess_ids) < min_prediction_size:
             print(
                 f"WARNING: you should provide at least {min_prediction_size} provenance items for a robust recall@{k} computation (you provided {len(guess_ids)} item(s))."
             )
@@ -209,12 +209,12 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
             # 3. success rate
             S_at_k["success_rate@{}".format(k)] = _success_rate_at_k(rank, k)
 
-        else:
-            print(
-                "WARNING: the number of distinct evidence sets is 0 for {}".format(
-                    gold_item
-                )
-            )
+        # else:
+        #     print(
+        #         "WARNING: the number of distinct evidence sets is 0 for {}".format(
+        #             gold_item
+        #         )
+        #     )
 
     return {"Rprec": Rprec, **P_at_k, **R_at_k, **S_at_k}
 
