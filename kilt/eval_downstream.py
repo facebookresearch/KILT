@@ -72,8 +72,8 @@ def _rougel_score(prediction, ground_truth):
     # no normalization
     try:
         scores = rouge.get_scores(prediction, ground_truth, avg=True)
-    except ValueError: # "Hypothesis is empty."
-        return 0.
+    except ValueError:  # "Hypothesis is empty."
+        return 0.0
     return scores["rouge-l"]["f"]
 
 
