@@ -1,7 +1,5 @@
-spacy
-bs4
-matplotlib
-nltk
 pymongo
 pytest
 jsonlines
+rouge
+pprint
