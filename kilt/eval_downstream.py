@@ -79,9 +79,8 @@ def __rougel_score(prediction, ground_truth):
     if not prediction:
         return 0.0
     rouge = Rouge()
-    scores = rouge.get_scores(
-        normalize_answer(prediction), normalize_answer(ground_truth), avg=True
-    )
+    # no normalization
+    scores = rouge.get_scores(prediction, ground_truth, avg=True)
     return scores["rouge-l"]["f"]
 
 
