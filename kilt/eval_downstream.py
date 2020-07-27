@@ -51,10 +51,7 @@ def normalize_answer(s):
 
 
 # F1 score definition
-def __f1_score(prediction, ground_truth):
-    if not prediction:
-        # print("WARNING: Null prediction")
-        return 0.0
+def _f1_score(prediction, ground_truth):
     prediction_tokens = normalize_answer(prediction).split()
     ground_truth_tokens = normalize_answer(ground_truth).split()
     common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
@@ -68,16 +65,12 @@ def __f1_score(prediction, ground_truth):
 
 
 # EM score definition
-def __exact_match_score_qa(prediction, ground_truth):
-    if not prediction:
-        return 0.0
+def _exact_match_score_qa(prediction, ground_truth):
     return normalize_answer(prediction) == normalize_answer(ground_truth)
 
 
 # ROUGEL score definition
-def __rougel_score(prediction, ground_truth):
-    if not prediction:
-        return 0.0
+def _rougel_score(prediction, ground_truth):
     rouge = Rouge()
     # no normalization
     scores = rouge.get_scores(prediction, ground_truth, avg=True)
@@ -114,13 +107,15 @@ def _calculate_metrics(gold_records, guess_records):
         # check if each output of guess file exist in set of candidate answers
         gold_candidate_answers = get_gold_answers(gold_item)
 
-        assert len(guess_item["output"]) == 1, "you should provide a single answer"
-
-        if "answer" in guess_item["output"][0]:
-            guess_answer = guess_item["output"][0]["answer"]
-        else:
-            # no answer provided
-            continue
+        conditions = (
+            (len(guess_item["output"]) == 1)
+            and ("answer" in guess_item["output"][0])
+            and len(str(guess_item["output"][0]["answer"]).strip()) > 0
+        )
+        assert (
+            conditions
+        ), f"you should provide exactly one valid answer for {guess_item['id']}"
+        guess_answer = str(guess_item["output"][0]["answer"]).strip()
 
         # 0. strict exact match
         if guess_answer in gold_candidate_answers:
@@ -128,27 +123,30 @@ def _calculate_metrics(gold_records, guess_records):
 
         # 1. qa normalized exact match
         local_em = _metric_max_over_ground_truths(
-            __exact_match_score_qa, guess_answer, gold_candidate_answers
+            _exact_match_score_qa, guess_answer, gold_candidate_answers
         )
         normalized_em += local_em
 
         # 2. normalized f1
         local_f1 = _metric_max_over_ground_truths(
-            __f1_score, guess_answer, gold_candidate_answers
+            _f1_score, guess_answer, gold_candidate_answers
         )
         normalized_f1 += local_f1
 
         # 3. rougel
         local_rougel = _metric_max_over_ground_truths(
-            __rougel_score, guess_answer, gold_candidate_answers
+            _rougel_score, guess_answer, gold_candidate_answers
         )
         rougel += local_rougel
 
         # KILT-metrics
-        ranking_metrics = retrieval_metrics.get_ranking_metrics(
-            guess_item, gold_item, ks=[], rank_keys=["wikipedia_id"]
+        guess_ids = retrieval_metrics._get_ids_list(
+            guess_item, rank_keys=["wikipedia_id"]
+        )[0]
+        Rprec = retrieval_metrics.rprecision(
+            guess_ids, gold_item, rank_keys=["wikipedia_id"]
         )
-        if ranking_metrics["Rprec"] == 1:
+        if Rprec == 1:
             # 1. KILT-em
             kilt_em += local_em
 

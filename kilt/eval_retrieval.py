@@ -1,27 +1,46 @@
 import argparse
 import pprint
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from kilt import kilt_utils
 from kilt import eval_downstream
 
 
-def _get_gold_ids_list(datapoint, rank_keys):
+def _remove_duplicates(obj):
+    obj_tmp = []
+    for o in obj:
+        if o not in obj_tmp:
+            obj_tmp.append(o)
+    return obj_tmp
+
+
+def _get_ids_list(datapoint, rank_keys):
     # collect all gold ids
-    gold_wikipedia_ids_list = []
+    ids_list = []
     for output in datapoint["output"]:
-        single_wikipedia_ids_list = []
+        current_ids_list = []
         if "provenance" in output:
             for provenance in output["provenance"]:
-                single_wikipedia_ids_list.append(
-                    "+".join(
-                        [str(provenance[rank_key]).strip() for rank_key in rank_keys]
+                if any(rank_key not in provenance for rank_key in rank_keys):
+                    missing = set(rank_keys) - set(
+                        list(provenance.keys())
+                    ).intersection(set(rank_keys))
+                    print(
+                        f"WARNING: missing key(s) {missing} in provenance, unable to compute retrieval for those."
                     )
-                )
-        gold_wikipedia_ids_list.append(list(set(single_wikipedia_ids_list)))
+                else:
+                    current_ids_list.append(
+                        "+".join(
+                            [
+                                str(provenance[rank_key]).strip()
+                                for rank_key in rank_keys
+                            ]
+                        )
+                    )
+        ids_list.append(_remove_duplicates(current_ids_list))  # remove duplidates
 
     # consider only unique ids
-    return gold_wikipedia_ids_list
+    return ids_list
 
 
 def get_rank(datapoint, predicted_page_ids, k, rank_keys):
@@ -132,13 +151,13 @@ def _success_rate_at_k(rank, k):
     return p
 
 
-def _computeRprec(gold_wikipedia_ids, predicted_page_ids):
+def _computeRprec(guess_ids, gold_ids):
 
-    R = len(gold_wikipedia_ids)
+    R = len(gold_ids)
     num = 0
 
-    for prediction in predicted_page_ids[:R]:
-        if str(prediction).strip() in gold_wikipedia_ids:
+    for prediction in guess_ids[:R]:
+        if str(prediction).strip() in gold_ids:
             num += 1
 
     Rprec = num / R if R > 0 else 0
@@ -146,22 +165,13 @@ def _computeRprec(gold_wikipedia_ids, predicted_page_ids):
 
 
 # R-precision https://link.springer.com/referenceworkentry/10.1007%2F978-0-387-39940-9_486
-def rprecision(datapoint, predicted_page_ids, rank_keys):
-
-    gold_wikipedia_ids_list = _get_gold_ids_list(datapoint, rank_keys)
+def rprecision(guess_ids, gold_datapoint, rank_keys):
+    gold_ids_list = _get_ids_list(gold_datapoint, rank_keys)
     Rprec_vector = []
-    for gold_wikipedia_ids in gold_wikipedia_ids_list:
-        Rprec = _computeRprec(gold_wikipedia_ids, predicted_page_ids)
+    for gold_ids in gold_ids_list:
+        Rprec = _computeRprec(guess_ids, gold_ids)
         Rprec_vector.append(Rprec)
     return max(Rprec_vector)
-
-
-def remove_duplicates(obj):
-    obj_tmp = []
-    for o in obj:
-        if o not in obj_tmp:
-            obj_tmp.append(o)
-    return obj_tmp
 
 
 def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
@@ -173,36 +183,16 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
 
     assert (
         "output" in guess_item and len(guess_item["output"]) == 1
-    ), "guess should provide exactly one output"
+    ), f"guess should provide exactly one output for {guess_item['id']}"
+    guess_ids = _get_ids_list(guess_item, rank_keys)[0]
 
-    output = guess_item["output"][0]
-    guess_wikipedia_ids = []
-
-    if "provenance" in output:
-        for provenance in output["provenance"]:
-            if any(rank_key not in provenance for rank_key in rank_keys):
-                missing = set(rank_keys) - set(list(provenance.keys())).intersection(
-                    set(rank_keys)
-                )
-                print(
-                    f"WARNING: missing key(s) {missing} in provenance, unable to compute retrieval for those."
-                )
-            else:
-                guess_wikipedia_ids.append(
-                    "+".join(
-                        [str(provenance[rank_key]).strip() for rank_key in rank_keys]
-                    )
-                )
-
-    guess_wikipedia_ids = remove_duplicates(guess_wikipedia_ids)
-
-    if len(guess_wikipedia_ids) > 0:
-        Rprec = rprecision(gold_item, guess_wikipedia_ids, rank_keys=rank_keys)
+    if len(guess_ids) > 0:
+        Rprec = rprecision(guess_ids, gold_item, rank_keys=rank_keys)
         for k in ks:
 
             # 0. get rank
             rank, num_distinct_evidence_sets = get_rank(
-                gold_item, guess_wikipedia_ids, k, rank_keys=rank_keys
+                gold_item, guess_ids, k, rank_keys=rank_keys
             )
 
             if num_distinct_evidence_sets > 0:
@@ -232,7 +222,7 @@ def compute(gold_dataset, guess_dataset, ks, rank_keys):
 
     ks = sorted([int(x) for x in ks])
 
-    result = {}
+    result = OrderedDict()
     result["Rprec"] = 0.0
     for k in ks:
         if k > 0:
