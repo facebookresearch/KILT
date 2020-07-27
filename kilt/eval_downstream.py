@@ -137,11 +137,8 @@ def _calculate_metrics(gold_records, guess_records):
         rougel += local_rougel
 
         # KILT-metrics
-        guess_ids = retrieval_metrics._get_ids_list(
-            guess_item, rank_keys=["wikipedia_id"]
-        )[0]
         Rprec = retrieval_metrics.rprecision(
-            guess_ids, gold_item, rank_keys=["wikipedia_id"]
+            guess_item, gold_item, rank_keys=["wikipedia_id"]
         )
         if Rprec == 1:
             # 1. KILT-em

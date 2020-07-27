@@ -43,7 +43,7 @@ def _get_ids_list(datapoint, rank_keys):
     return ids_list
 
 
-def get_rank(datapoint, predicted_page_ids, k, rank_keys):
+def get_rank(guess_item, gold_item, k, rank_keys):
     """
     The main idea is to consider each evidence set as a single point in the rank.
     The score in the rank for an evidence set is given by the lowest scored evidence in the set.
@@ -54,12 +54,14 @@ def get_rank(datapoint, predicted_page_ids, k, rank_keys):
     rank = []
     num_distinct_evidence_sets = 0
 
-    if predicted_page_ids and len(predicted_page_ids) > 0:
+    guess_ids = _get_ids_list(guess_item, rank_keys)[0]
+
+    if guess_ids and len(guess_ids) > 0:
 
         # 1. collect evidence sets and their sizes
         evidence_sets = []
         e_size = defaultdict(int)
-        for output in datapoint["output"]:
+        for output in gold_item["output"]:
             if "provenance" in output:
                 e_set = {
                     "+".join(
@@ -86,31 +88,31 @@ def get_rank(datapoint, predicted_page_ids, k, rank_keys):
         # if the number of evidence sets is smaller than k
         min_prediction_size += k - c
 
-        if len(predicted_page_ids) < min_prediction_size:
+        if len(guess_ids) < min_prediction_size:
             print(
-                f"WARNING: you should provide at least {min_prediction_size} provenance items for a robust recall@{k} computation (you provided {len(predicted_page_ids)} item(s))."
+                f"WARNING: you should provide at least {min_prediction_size} provenance items for a robust recall@{k} computation (you provided {len(guess_ids)} item(s))."
             )
 
         # 3. rank by gruping pages in each evidence set (each evidence set count as 1),
-        # the position in the rank of each evidence set is given by the last page in predicted_page_ids
+        # the position in the rank of each evidence set is given by the last page in guess_ids
         # non evidence pages counts as 1
         rank = []
-        for page in predicted_page_ids:
-            page = str(page).strip()
+        for guess_id in guess_ids:
+            guess_id = str(guess_id).strip()
             found = False
             for idx, e_set in enumerate(evidence_sets):
 
                 e_set_id = f"evidence_set:{idx}"
 
-                if page in e_set:
+                if guess_id in e_set:
                     found = True
 
                     # remove from the rank previous points referring to this evidence set
                     if e_set_id in rank:
                         rank.remove(e_set_id)
 
-                    # remove the page from the evidence set
-                    e_set.remove(page)
+                    # remove the guess_id from the evidence set
+                    e_set.remove(guess_id)
 
                     if len(e_set) == 0:
                         # it was the last evidence, it counts as true in the rank
@@ -165,8 +167,9 @@ def _computeRprec(guess_ids, gold_ids):
 
 
 # R-precision https://link.springer.com/referenceworkentry/10.1007%2F978-0-387-39940-9_486
-def rprecision(guess_ids, gold_datapoint, rank_keys):
-    gold_ids_list = _get_ids_list(gold_datapoint, rank_keys)
+def rprecision(guess_item, gold_item, rank_keys):
+    gold_ids_list = _get_ids_list(gold_item, rank_keys)
+    guess_ids = _get_ids_list(guess_item, rank_keys)[0]
     Rprec_vector = []
     for gold_ids in gold_ids_list:
         Rprec = _computeRprec(guess_ids, gold_ids)
@@ -184,36 +187,34 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
     assert (
         "output" in guess_item and len(guess_item["output"]) == 1
     ), f"guess should provide exactly one output for {guess_item['id']}"
-    guess_ids = _get_ids_list(guess_item, rank_keys)[0]
 
-    if len(guess_ids) > 0:
-        Rprec = rprecision(guess_ids, gold_item, rank_keys=rank_keys)
-        for k in ks:
+    Rprec = rprecision(guess_item, gold_item, rank_keys=rank_keys)
+    for k in ks:
 
-            # 0. get rank
-            rank, num_distinct_evidence_sets = get_rank(
-                gold_item, guess_ids, k, rank_keys=rank_keys
+        # 0. get rank
+        rank, num_distinct_evidence_sets = get_rank(
+            guess_item, gold_item, k, rank_keys=rank_keys
+        )
+
+        if num_distinct_evidence_sets > 0:
+
+            # 1. precision
+            P_at_k["precision@{}".format(k)] = _precision_at_k(rank, k)
+
+            # 2. recall
+            R_at_k["recall@{}".format(k)] = _recall_at_k(
+                rank, num_distinct_evidence_sets, k
             )
 
-            if num_distinct_evidence_sets > 0:
+            # 3. success rate
+            S_at_k["success_rate@{}".format(k)] = _success_rate_at_k(rank, k)
 
-                # 1. precision
-                P_at_k["precision@{}".format(k)] = _precision_at_k(rank, k)
-
-                # 2. recall
-                R_at_k["recall@{}".format(k)] = _recall_at_k(
-                    rank, num_distinct_evidence_sets, k
+        else:
+            print(
+                "WARNING: the number of distinct evidence sets is 0 for {}".format(
+                    gold_item
                 )
-
-                # 3. success rate
-                S_at_k["success_rate@{}".format(k)] = _success_rate_at_k(rank, k)
-
-            else:
-                print(
-                    "WARNING: the number of distinct evidence sets is 0 for {}".format(
-                        gold_item
-                    )
-                )
+            )
 
     return {"Rprec": Rprec, **P_at_k, **R_at_k, **S_at_k}
 
