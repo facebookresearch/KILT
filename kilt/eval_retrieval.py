@@ -37,7 +37,7 @@ def _get_ids_list(datapoint, rank_keys):
                             ]
                         )
                     )
-        ids_list.append(_remove_duplicates(current_ids_list))  # remove duplidates
+        ids_list.append(_remove_duplicates(current_ids_list))  # remove duplicates
 
     # consider only unique ids
     return ids_list
