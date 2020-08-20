@@ -1,21 +1,23 @@
 {
-    "fact checking": {
-        "FEVER": "/checkpoint/fabiopetroni/KILT/datasets/fever-dev-kilt.jsonl"
+    "Fact Checking": {
+        "FEVER": "data/fever-dev-kilt.jsonl"
     },
-    "open domain QA": {
-        "Natural Questions": "/checkpoint/fabiopetroni/KILT/datasets/nq-dev-kilt.jsonl",
-        "HotpotQA": "/checkpoint/fabiopetroni/KILT/datasets/hotpotqa-dev-kilt.jsonl",
-        "TriviaQA": "/checkpoint/fabiopetroni/KILT/datasets/triviaqa-dev-kilt.jsonl"
+    "Entity Linking": {
+        "AIDA-YAGO2": "data/aidayago2-dev-kilt.jsonl",
+        "WNED": "data/wned-dev-kilt.jsonl",
+        "CWEB": "data/cweb-dev-kilt.jsonl"
     },
-    "relation extraction": {
-        "Zero Shot RE": "/checkpoint/fabiopetroni/KILT/datasets/zeroshot-dev-kilt.jsonl"
+    "Slot Filling": {
+        "Zero Shot RE": "data/structured_zeroshot-dev-kilt.jsonl",
+        "T-REx": "data/trex-dev-kilt.jsonl"
     },
-    "entity linking": {
-        "AIDA-YAGO2": "/checkpoint/fabiopetroni/KILT/datasets/aidayago2-dev-kilt.jsonl",
-        "WNED": "/checkpoint/fabiopetroni/KILT/datasets/wned-dev-kilt.jsonl",
-        "CWEB": "/checkpoint/fabiopetroni/KILT/datasets/cweb-dev-kilt.jsonl"
+    "Open Domain QA": {
+        "Natural Questions": "data/nq-dev-kilt.jsonl",
+        "HotpotQA": "data/hotpotqa-dev-kilt.jsonl",
+        "TriviaQA": "data/triviaqa-dev-kilt.jsonl",
+        "ELI5": "data/eli5-dev-kilt.jsonl"
     },
-    "dialogue": {
-        "Wizard of Wikipedia": "/checkpoint/fabiopetroni/KILT/datasets/wow-dev-kilt.jsonl"
+    "Dialogue": {
+        "Wizard of Wikipedia": "data/wow-dev-kilt.jsonl"
     }
 }

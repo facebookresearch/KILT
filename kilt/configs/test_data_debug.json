@@ -1,12 +1,4 @@
 {
-    "Fact Checking": {
-        "FEVER": "data/fever-test_without_answers-kilt.jsonl"
-    },
-    "Entity Linking": {
-        "AIDA-YAGO2": "data/aidayago2-test_without_answers-kilt.jsonl",
-        "WNED": "data/wned-test_without_answers-kilt.jsonl",
-        "CWEB": "data/cweb-test_without_answers-kilt.jsonl"
-    },
     "Slot Filling": {
         "Zero Shot RE": "data/structured_zeroshot-test_without_answers-kilt.jsonl",
         "T-REx": "data/trex-test_without_answers-kilt.jsonl"

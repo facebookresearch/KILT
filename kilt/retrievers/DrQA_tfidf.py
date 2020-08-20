@@ -1,8 +1,8 @@
 import multiprocessing
 from multiprocessing.pool import ThreadPool
 
-from drqa import retriever
 from tqdm import tqdm
+from drqa import retriever
 
 import kilt.kilt_utils as utils
 from kilt.retrievers.base_retriever import Retriever
@@ -84,16 +84,19 @@ class DrQA(Retriever):
         all_doc_id = []
         all_doc_scores = []
         all_query_id = []
+        provenance = {}
 
         for x in results:
             i, s, q = x
             all_doc_id.extend(i)
             all_doc_scores.extend(s)
             all_query_id.extend(q)
+            for query_id, doc_ids in zip(q, i):
+                provenance[query_id] = []
+                for d_id in doc_ids:
+                    provenance[query_id].append({"wikipedia_id": str(d_id).strip()})
 
         pool.terminate()
         pool.join()
 
-        meta = None
-
-        return all_doc_id, all_doc_scores, all_query_id, meta
+        return all_doc_id, all_doc_scores, all_query_id, provenance

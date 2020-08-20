@@ -1,10 +1,10 @@
 import argparse
+import logging
+import pickle
 
 from flair.models import SequenceTagger
 from flair.data import Sentence
 import blink.main_dense as main_dense
-import logging
-import pickle
 
 from kilt.retrievers.base_retriever import Retriever
 from kilt.knowledge_source import KnowledgeSource
@@ -15,6 +15,7 @@ WIKIPEDIA_TITLE2ID = "/checkpoint/fabiopetroni/KILT/Wikipedia_title2id.p"
 class BLINK(Retriever):
     def __init__(self, name, **config):
         super().__init__(name)
+
         self.args = argparse.Namespace(**config)
 
         self.logger = logging.getLogger("KILT")
@@ -128,7 +129,7 @@ class BLINK(Retriever):
         all_query_id = []
         all_scores = []
 
-        meta = {}
+        provenance = {}
 
         for id, results in id_2_results.items():
 
@@ -178,6 +179,6 @@ class BLINK(Retriever):
             all_doc_id.append(local_doc_id)
             all_scores.append(sorted_scores)
             all_query_id.append(id)
-            meta[id] = element["retrieved"]
+            provenance[id] = element["retrieved"]
 
-        return all_doc_id, all_scores, all_query_id, meta
+        return all_doc_id, all_scores, all_query_id, provenance

@@ -1,5 +1,4 @@
 import nltk
-import spacy
 import json
 import os
 import logging
@@ -35,48 +34,51 @@ def validate_datapoint(datapoint, logger):
         return False
 
     # output is not empty
-    if len(datapoint["output"]) == 0:
-        if logger:
-            logger.warning("[{}] empty output".format(datapoint["id"]))
-        return False
-
-    for output in datapoint["output"]:
-        # answer is a string
-        if not isinstance(output["answer"], str):
+    if "output" in datapoint:
+        if len(datapoint["output"]) == 0:
             if logger:
-                logger.warning(
-                    "[{}] answer is not a string {}".format(
-                        datapoint["id"], output["answer"]
-                    )
-                )
+                logger.warning("[{}] empty output".format(datapoint["id"]))
             return False
 
-        # provenance is not empty
-        # if len(output["provenance"]) == 0:
-        #    if logger:
-        #        logger.warning("[{}] empty provenance".format(datapoint["id"]))
-        #    return False
-
-        for provenance in output["provenance"]:
-            # wikipedia_id is provided
-            if not isinstance(provenance["wikipedia_id"], str):
-                if logger:
-                    logger.warning(
-                        "[{}] wikipedia_id is not a string {}".format(
-                            datapoint["id"], provenance["wikipedia_id"]
+        for output in datapoint["output"]:
+            # answer is a string
+            if "answer" in output:
+                if not isinstance(output["answer"], str):
+                    if logger:
+                        logger.warning(
+                            "[{}] answer is not a string {}".format(
+                                datapoint["id"], output["answer"]
+                            )
                         )
-                    )
-                return False
+                    return False
 
-            # title is provided
-            if not isinstance(provenance["title"], str):
-                if logger:
-                    logger.warning(
-                        "[{}] title is not a string {}".format(
-                            datapoint["id"], provenance["title"]
-                        )
-                    )
-                return False
+            # provenance is not empty
+            # if len(output["provenance"]) == 0:
+            #    if logger:
+            #        logger.warning("[{}] empty provenance".format(datapoint["id"]))
+            #    return False
+
+            if "provenance" in output:
+                for provenance in output["provenance"]:
+                    # wikipedia_id is provided
+                    if not isinstance(provenance["wikipedia_id"], str):
+                        if logger:
+                            logger.warning(
+                                "[{}] wikipedia_id is not a string {}".format(
+                                    datapoint["id"], provenance["wikipedia_id"]
+                                )
+                            )
+                        return False
+
+                    # title is provided
+                    if not isinstance(provenance["title"], str):
+                        if logger:
+                            logger.warning(
+                                "[{}] title is not a string {}".format(
+                                    datapoint["id"], provenance["title"]
+                                )
+                            )
+                        return False
 
     return True
 
@@ -93,11 +95,11 @@ def load_data(filename):
 def store_data(filename, data):
     with open(filename, "w+") as outfile:
         for idx, element in enumerate(data):
-            #print(round(idx * 100 / len(data), 2), "%", end="\r")
-            #sys.stdout.flush()
+            # print(round(idx * 100 / len(data), 2), "%", end="\r")
+            # sys.stdout.flush()
             json.dump(element, outfile)
             outfile.write("\n")
-            
+
 
 def get_bleu(candidate_tokens, gold_tokens):
 
@@ -177,24 +179,3 @@ def create_logdir_with_timestamp(base_logdir):
     log_directory = "{}/{}_{}/".format(base_logdir, timestr, random.randint(0, 1000))
     os.makedirs(log_directory)
     return log_directory
-
-
-if __name__ == "__main__":
-    from kilt.knowledge_source import KnowledgeSource
-
-    ks = KnowledgeSource()
-    # page = ks.get_page_by_id(10287141)
-    # evidence = "While Chen Yi-hsiung's death was officially ruled a suicide, with both suicide notes (supposedly burned by his family) and a video of his wife apologizing for her husband's crime backing up this theory, opponents of president Chen disagree with this conclusion."
-
-    page = ks.get_page_by_id(1101759)
-    evidence = "a newsletter sent to an advertising firm 's customers"
-    paragraph_id, start_character, end_character, max_bleu = match_answer(
-        evidence, page
-    )
-
-    print(paragraph_id, start_character, end_character, max_bleu)
-
-    print(max_bleu)
-
-    span = page["text"][paragraph_id][start_character:end_character]
-    print(span)

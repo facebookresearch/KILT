@@ -1,20 +1,23 @@
 {
-    "fact checking": {
-        "FEVER": "/checkpoint/fabiopetroni/KILT/datasets/fever-train-kilt.jsonl"
+    "Fact Checking": {
+        "FEVER": "data/fever-train-kilt.jsonl"
     },
-    "open domain QA": {
-        "Natural Questions": "/checkpoint/fabiopetroni/KILT/datasets/nq-train-kilt.jsonl",
-        "HotpotQA": "/checkpoint/fabiopetroni/KILT/datasets/hotpotqa-train-kilt.jsonl",
-        "TriviaQA": "/checkpoint/fabiopetroni/KILT/datasets/triviaqa-train-kilt.jsonl"
+    "Entity Linking": {
+        "AIDA-YAGO2": "data/aidayago2-train-kilt.jsonl",
+        "WNED": "data/wned-train-kilt.jsonl",
+        "CWEB": "data/cweb-train-kilt.jsonl"
     },
-    "relation extraction": {
-        "Zero Shot RE": "/checkpoint/fabiopetroni/KILT/datasets/zeroshot-train-kilt.jsonl"
+    "Slot Filling": {
+        "Zero Shot RE": "data/structured_zeroshot-train-kilt.jsonl",
+        "T-REx": "data/trex-train-kilt.jsonl"
     },
-    "entity linking": {
-        "AIDA-YAGO2": "/checkpoint/fabiopetroni/KILT/datasets/aidayago2-train-kilt.jsonl",
-        "TACKBP-2010": "/checkpoint/fabiopetroni/KILT/datasets/tackbp2010-train-kilt.jsonl"
+    "Open Domain QA": {
+        "Natural Questions": "data/nq-train-kilt.jsonl",
+        "HotpotQA": "data/hotpotqa-train-kilt.jsonl",
+        "TriviaQA": "data/triviaqa-train-kilt.jsonl",
+        "ELI5": "data/eli5-train-kilt.jsonl"
     },
-    "dialogue": {
-        "Wizard of Wikipedia": "/checkpoint/fabiopetroni/KILT/datasets/wow-train-kilt.jsonl"
+    "Dialogue": {
+        "Wizard of Wikipedia": "data/wow-train-kilt.jsonl"
     }
 }

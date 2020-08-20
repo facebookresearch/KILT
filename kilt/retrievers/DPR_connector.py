@@ -3,10 +3,6 @@ import argparse
 import glob
 import pickle
 
-import sys
-
-sys.path.insert(0, "src/dpr")
-
 from dpr.utils.model_utils import (
     load_states_from_checkpoint,
     setup_for_distributed_mode,
@@ -26,7 +22,6 @@ from dpr.indexer.faiss_indexers import (
     DenseFlatIndexer,
 )
 
-
 from kilt.configs import retriever
 import kilt.kilt_utils as utils
 from kilt.retrievers.base_retriever import Retriever
@@ -35,6 +30,7 @@ from kilt.retrievers.base_retriever import Retriever
 class DPR(Retriever):
     def __init__(self, name, **config):
         super().__init__(name)
+
         self.args = argparse.Namespace(**config)
         saved_state = load_states_from_checkpoint(self.args.model_file)
         set_encoder_params_from_state(saved_state.encoder_params, self.args)
@@ -123,7 +119,7 @@ class DPR(Retriever):
         #     ),
         # )
 
-        meta = {}
+        provenance = {}
 
         all_doc_id = []
         all_query_id = []
@@ -165,11 +161,11 @@ class DPR(Retriever):
                     }
                 )
 
-            assert query_id not in meta
-            meta[query_id] = element["retrieved"]
+            assert query_id not in provenance
+            provenance[query_id] = element["retrieved"]
 
             all_doc_id.append(doc_id)
             all_doc_scores.append(doc_scores)
             all_query_id.append(query_id)
 
-        return all_doc_id, all_doc_scores, all_query_id, meta
+        return all_doc_id, all_doc_scores, all_query_id, provenance

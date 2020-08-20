@@ -1,9 +1,9 @@
 import json
 import argparse
 
-from kilt import ranker_evaluation
+from kilt import retrieval
 from kilt import kilt_utils as utils
-from kilt.retrievers import DrQA_tfidf, Solr_BM25, DPR_connector, BLINK_connector
+from kilt.retrievers import DrQA_tfidf, DPR_connector, BLINK_connector
 
 
 def execute(
@@ -11,13 +11,9 @@ def execute(
 ):
 
     # run evaluation
-    result = ranker_evaluation.run(
+    retrieval.run(
         test_config_json, retriever, model_name, logger, output_folder=output_folder
     )
-
-    # dump results on json file
-    with open("{}/{}_result.json".format(log_directory, model_name), "w") as outfile:
-        json.dump(result, outfile)
 
 
 def main(args):
@@ -41,16 +37,8 @@ def main(args):
             )
         else:
             retriever = DrQA_tfidf.DrQA.from_default_config(args.model_name)
-    elif args.model_name == "solr":
-        # 2. Solr BM25,
-        if args.model_configuration:
-            retriever = Solr_BM25.Solr.from_config_file(
-                args.model_name, args.model_configuration
-            )
-        else:
-            retriever = Solr_BM25.Solr.from_default_config(args.model_name)
     elif args.model_name == "dpr":
-        # 3. DPR
+        # 2. DPR
         if args.model_configuration:
             retriever = DPR_connector.DPR.from_config_file(
                 args.model_name, args.model_configuration
@@ -58,7 +46,7 @@ def main(args):
         else:
             retriever = DPR_connector.DPR.from_default_config(args.model_name)
     elif args.model_name == "blink":
-        # 4. BLINK
+        # 3. BLINK
         if args.model_configuration:
             retriever = BLINK_connector.BLINK.from_config_file(
                 args.model_name, args.model_configuration

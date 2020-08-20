@@ -3,3 +3,10 @@ pytest
 jsonlines
 rouge
 pprint
+prettytable
+tqdm
+nltk
+torch
+bs4
+faiss
+flair

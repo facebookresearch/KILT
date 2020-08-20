@@ -1,8 +1,0 @@
-{
-    "solr_address": "http://localhost:8983/solr/wikipedia_passages_2018",
-    "fl": "* score",
-    "rows": 1000,
-    "defType": "lucene",
-    "num_threads": 64,
-    "KILT_mapping": "/checkpoint/fabiopetroni/KILT/retriever/DPR/mapping_original_DPR_KILT.p"
-}

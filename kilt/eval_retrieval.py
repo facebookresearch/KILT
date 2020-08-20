@@ -14,7 +14,7 @@ def _remove_duplicates(obj):
     return obj_tmp
 
 
-def _get_ids_list(datapoint, rank_keys):
+def _get_ids_list(datapoint, rank_keys, verbose=False):
     # collect all gold ids
     ids_list = []
     for output in datapoint["output"]:
@@ -25,9 +25,10 @@ def _get_ids_list(datapoint, rank_keys):
                     missing = set(rank_keys) - set(
                         list(provenance.keys())
                     ).intersection(set(rank_keys))
-                    print(
-                        f"WARNING: missing key(s) {missing} in provenance, unable to compute retrieval for those."
-                    )
+                    if verbose:
+                        print(
+                            f"WARNING: missing key(s) {missing} in provenance, unable to compute retrieval for those."
+                        )
                 else:
                     current_ids_list.append(
                         "+".join(
