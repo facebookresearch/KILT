@@ -1,0 +1,23 @@
+{
+    "Fact Checking": {
+        "FEVER": "data/fever-test_without_answers-kilt.jsonl"
+    },
+    "Entity Linking": {
+        "AIDA-YAGO2": "data/aidayago2-test_without_answers-kilt.jsonl",
+        "WNED": "data/wned-test_without_answers-kilt.jsonl",
+        "CWEB": "data/cweb-test_without_answers-kilt.jsonl"
+    },
+    "Slot Filling": {
+        "Zero Shot RE": "data/structured_zeroshot-test_without_answers-kilt.jsonl",
+        "T-REx": "data/trex-test_without_answers-kilt.jsonl"
+    },
+    "Open Domain QA": {
+        "Natural Questions": "data/nq-test_without_answers-kilt.jsonl",
+        "HotpotQA": "data/hotpotqa-test_without_answers-kilt.jsonl",
+        "TriviaQA": "data/triviaqa-test_without_answers-kilt.jsonl",
+        "ELI5": "data/eli5-test_without_answers-kilt.jsonl"
+    },
+    "Dialogue": {
+        "Wizard of Wikipedia": "data/wow-test_without_answers-kilt.jsonl"
+    }
+}

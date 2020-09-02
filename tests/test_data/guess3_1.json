@@ -1,0 +1,26 @@
+{
+    "id": 1,
+    "output": [
+        {
+            "answer": "the #### transcript is a written version of each day 's cnn student news program use this transcript to he    lp students with reading comprehension and vocabulary use the weekly newsquiz to test your knowledge of storie s you     saw on cnn student news",
+            "provenance": [
+                {
+                    "wikipedia_id": 1
+                }
+            ]
+        }
+    ]
+}
+{
+    "id": 2,
+    "output": [
+        {
+            "answer": "the #### transcript is a written version of each day 's cnn student news program use this transcript to he    lp students with reading comprehension and vocabulary use the weekly newsquiz to test your knowledge of storie s you     saw on cnn student news",
+            "provenance": [
+                {
+                    "wikipedia_id": "2"
+                }
+            ]
+        }
+    ]
+}
