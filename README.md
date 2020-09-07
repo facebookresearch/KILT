@@ -3,6 +3,24 @@
 
 # A Benchmark for Knowledge Intensive Language Tasks
 
+
+The KILT benchmark is described in the following paper:
+
+```bibtex
+@inproceedings{petroni2020kilt,
+ title={KILT: a Benchmark for Knowledge Intensive Language Tasks},
+ author={Fabio Petroni, Aleksandra Piktus, Angela Fan, Patrick Lewis, Majid Yazdani, Nicola De Cao, James Thorne, Yacine Jernite, Vassilis Plachouras, Tim Rockt{\"{a}}schel, Sebastian Riedel},
+ booktitle={arXiv:2009.02252},
+ year={2020}
+}
+```
+
+[https://arxiv.org/abs/2009.02252](https://arxiv.org/abs/2009.02252)
+
+Test sets are not publicly released, but are used for [the KILT challenge on EvalAI](https://evalai.cloudcv.org/web/challenges/challenge-page/689/overview) where participants can upload their models’ predictions and be listed on the public leaderboard.
+
+You can use KILT data directly in [the HuggingFace's nlp library](https://huggingface.co/datasets?search=kilt).
+
 ## Setup the env
 
 ```bash
