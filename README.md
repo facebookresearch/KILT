@@ -19,8 +19,6 @@ The KILT benchmark is described in the following paper:
 
 Test sets are not publicly released, but are used for [the KILT challenge on EvalAI](https://evalai.cloudcv.org/web/challenges/challenge-page/689/overview) where participants can upload their models’ predictions and be listed on the public leaderboard.
 
-You can also download and use the KILT data through [the HuggingFace's nlp library](https://huggingface.co/datasets?search=kilt).
-
 ## Setup the env
 
 ```bash
@@ -86,6 +84,8 @@ mkdir data
 python scripts/donwload_all_kilt_data.py
 python scripts/get_triviaqa_input.py
 ```
+
+You can also download and use the KILT data through [the HuggingFace's nlp library](https://huggingface.co/datasets?search=kilt).
 
 ### KILT data format
 
