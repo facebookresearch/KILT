@@ -171,7 +171,7 @@ def preprocess_data(num_threads, folder):
 def main(rank, num_threads, folder, chunk_size):
 
     print("loading chunk {}".format(rank), flush=True)
-    documents = load_chunk(rank)
+    documents = load_chunk(rank, folder)
 
     arguments = [
         {
