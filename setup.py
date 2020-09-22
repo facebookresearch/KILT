@@ -12,7 +12,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="kilt",
-    version="0.1.0",,
+    version="0.1.0",
     description="Knowledge Intensive Language Tasks",
     long_description=long_description,
     long_description_content_type="text/markdown",
