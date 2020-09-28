@@ -8,6 +8,7 @@
     "entity_encoding": "models/all_entities_large.t7",
     "crossencoder_model": "models/crossencoder_wiki_large.bin",
     "crossencoder_config": "models/crossencoder_wiki_large.json",
+    "wikipedia_title2id": "models/Wikipedia_title2id.p",
     "fast": true,
     "output_path": "logs/"
 }

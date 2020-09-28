@@ -11,11 +11,16 @@ DEFAULT_MONGO_CONNECTION_STRING = "mongodb://127.0.0.1:27017/admin"
 
 
 class KnowledgeSource:
-    def __init__(self, mongo_connection_string=None):
+    def __init__(
+        self,
+        mongo_connection_string=None,
+        database="kilt",
+        collection="knowledgesource",
+    ):
         if not mongo_connection_string:
             mongo_connection_string = DEFAULT_MONGO_CONNECTION_STRING
         self.client = MongoClient(mongo_connection_string)
-        self.db = self.client.kilt.knowledgesource
+        self.db = self.client[database][collection]
 
     def get_all_pages_cursor(self):
         cursor = self.db.find({})

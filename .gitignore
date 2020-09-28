@@ -4,6 +4,7 @@ output
 src
 predictions
 models 
+NHKB/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

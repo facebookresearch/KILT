@@ -14,9 +14,6 @@ from flair.data import Sentence
 import blink.main_dense as main_dense
 
 from kilt.retrievers.base_retriever import Retriever
-from kilt.knowledge_source import KnowledgeSource
-
-WIKIPEDIA_TITLE2ID = "/checkpoint/fabiopetroni/KILT/Wikipedia_title2id.p"
 
 
 class BLINK(Retriever):
@@ -29,13 +26,11 @@ class BLINK(Retriever):
 
         self.models = main_dense.load_models(self.args, logger=self.logger)
 
-        # self.ks = KnowledgeSource()
-
         self.ner_model = SequenceTagger.load("ner")
 
         self.cache_pages = {}
 
-        self.Wikipedia_title2id = pickle.load(open(WIKIPEDIA_TITLE2ID, "rb"))
+        self.Wikipedia_title2id = pickle.load(open(self.args.wikipedia_title2id, "rb"))
 
     def fed_data(
         self,

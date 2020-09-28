@@ -1,11 +1,11 @@
 {
-    "Fact Checking": {
-        "FEVER": "data/fever-train-kilt.jsonl"
-    },
     "Entity Linking": {
         "AIDA-YAGO2": "data/aidayago2-train-kilt.jsonl",
         "WNED": "data/wned-train-kilt.jsonl",
         "CWEB": "data/cweb-train-kilt.jsonl"
+    },
+    "Fact Checking": {
+        "FEVER": "data/fever-train-kilt.jsonl"
     },
     "Slot Filling": {
         "Zero Shot RE": "data/structured_zeroshot-train-kilt.jsonl",
