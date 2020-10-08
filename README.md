@@ -27,7 +27,7 @@ pip install -r requirements.txt
 
 ## KILT knowledge source
 
-The KILT knowledge source can be downloaded here: [kilt_knowledgesource.json](http://dl.fbaipublicfiles.com/KILT/kilt_knowledgesource.json).<br>
+The KILT knowledge source can be downloaded here: [kilt_knowledgesource.json](http://dl.fbaipublicfiles.com/KILT/kilt_knowledgesource.json) (34.76GiB).<br>
 It is based on the [2019/08/01 Wikipedia dump](http://dl.fbaipublicfiles.com/BLINK/enwiki-pages-articles.xml.bz2).<br>
 We use [mongoDB](https://www.mongodb.com) to index the knowledge base (but you can use any json-based db).<br>
 To import the knowledge source in mongoDB run:
