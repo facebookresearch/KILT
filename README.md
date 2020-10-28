@@ -3,7 +3,7 @@
 
 # A Benchmark for Knowledge Intensive Language Tasks
 
-[http://kiltbenchmark.com/](http://kiltbenchmark.com/)
+[http://kiltbenchmark.com/](http://kiltbenchmark.com)
 
 
 The KILT benchmark is described in the following paper:
