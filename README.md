@@ -11,7 +11,7 @@ The KILT benchmark is described in the following paper:
 ```bibtex
 @inproceedings{petroni2020kilt,
  title={KILT: a Benchmark for Knowledge Intensive Language Tasks},
- author={Fabio Petroni, Aleksandra Piktus, Angela Fan, Patrick Lewis, Majid Yazdani, Nicola De Cao, James Thorne, Yacine Jernite, Vassilis Plachouras, Tim Rockt{\"{a}}schel, Sebastian Riedel},
+ author={Fabio Petroni and Aleksandra Piktus and Angela Fan and Patrick Lewis and Majid Yazdani and Nicola De Cao and James Thorne and Yacine Jernite and Vassilis Plachouras and Tim Rockt{\"{a}}schel and Sebastian Riedel},
  booktitle={arXiv:2009.02252},
  year={2020}
 }
