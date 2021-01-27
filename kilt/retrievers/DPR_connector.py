@@ -64,8 +64,12 @@ class DPR(Retriever):
             for (key, value) in saved_state.model_dict.items()
             if key.startswith("question_model.")
         }
-        model_to_load.load_state_dict(question_encoder_state)
+        model_to_load.load_state_dict(question_encoder_state, strict=False)
         vector_size = model_to_load.get_out_size()
+
+        # index all passages
+        ctx_files_pattern = self.args.encoded_ctx_file
+        input_paths = glob.glob(ctx_files_pattern)
 
         index_buffer_sz = self.args.index_buffer
         if self.args.hnsw_index:
@@ -73,17 +77,11 @@ class DPR(Retriever):
             index.deserialize_from(self.args.hnsw_index_path)
         else:
             index = DenseFlatIndexer(vector_size)
+            index.index_data(input_paths)
 
         self.retriever = DenseRetriever(
             encoder, self.args.batch_size, tensorizer, index
         )
-
-        # index all passages
-        ctx_files_pattern = self.args.encoded_ctx_file
-        input_paths = glob.glob(ctx_files_pattern)
-
-        if not self.args.hnsw_index:
-            self.retriever.index_encoded_data(input_paths, buffer_size=index_buffer_sz)
 
         # not needed for now
         self.all_passages = load_passages(self.args.ctx_file)
