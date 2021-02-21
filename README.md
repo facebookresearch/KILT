@@ -82,7 +82,7 @@ Examples:
 
 ```bash
 mkdir data
-python scripts/donwload_all_kilt_data.py
+python scripts/download_all_kilt_data.py
 python scripts/get_triviaqa_input.py
 ```
 
