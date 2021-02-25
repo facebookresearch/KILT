@@ -26,7 +26,7 @@ python scripts/execute_retrieval.py -m drqa -o predictions/drqa
 
 ## install
 ```bash
-pip install -e git+git@github.com:facebookresearch/DPR.git#egg=DPR
+pip install -e git+https://github.com/facebookresearch/DPR.git#egg=DPR
 ```
 
 change line 185 of `src/dpr/dense_retriever.py` to
@@ -56,7 +56,7 @@ python scripts/execute_retrieval.py -m dpr -o predictions/dpr
 
 ## install
 ```bash
-pip install -e git+git@github.com:facebookresearch/BLINK.git#egg=BLINK
+pip install -e git+https://github.com/facebookresearch/BLINK.git#egg=BLINK
 ```
 
 ## download models
