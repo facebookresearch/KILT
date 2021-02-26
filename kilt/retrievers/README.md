@@ -6,11 +6,6 @@ pip install -e git+https://github.com/facebookresearch/DrQA#egg=DrQA
 pip install pexpect==4.8
 ```
 
-change line 36 of `src/drqa/drqa/retriever/utils.py` to
-```python
-loader = np.load(filename, allow_pickle=True)
-```
-
 ## download models
 
 Download the following files in the `models` folder.
@@ -27,15 +22,6 @@ python scripts/execute_retrieval.py -m drqa -o predictions/drqa
 ## install
 ```bash
 pip install -e git+https://github.com/facebookresearch/DPR.git#egg=DPR
-```
-
-change line 185 of `src/dpr/dense_retriever.py` to
-
-```python
-try:
-    db_id, doc_vector = doc
-except:
-    title, db_id, doc_vector = doc
 ```
 
 ## download models
@@ -61,7 +47,7 @@ pip install -e git+https://github.com/facebookresearch/BLINK.git#egg=BLINK
 
 ## download models
 
-Download files in the `models` folder using the following script: [download_models.sh](https://github.com/facebookresearch/BLINK/blob/master/download_models.sh)
+Download files in the `models` folder using the following script: [download_models.sh](https://github.com/facebookresearch/BLINK/blob/master/download_blink_models.sh)
 
 And this file:
 - [Wikipedia_title2id.p](http://dl.fbaipublicfiles.com/KILT/Wikipedia_title2id.p)
