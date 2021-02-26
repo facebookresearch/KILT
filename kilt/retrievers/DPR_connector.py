@@ -138,7 +138,7 @@ class DPR(Retriever):
             element = {"id": str(query_id), "retrieved": []}
 
             # sort by score in descending order
-            for score, id in sorted(zip(scores, top_ids)):
+            for score, id in sorted(zip(scores, top_ids), reverse=True):
 
                 text = self.all_passages[id][0]
                 index = self.all_passages[id][1]
