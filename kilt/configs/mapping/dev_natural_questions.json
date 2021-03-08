@@ -1,0 +1,5 @@
+{
+    "input_file": "original_data/v1.0-simplified_simplified-nq-dev.jsonl",
+    "output_file": "output/nq-dev-kilt.jsonl",
+    "log_file": "output/nq-dev-kilt.log"
+}

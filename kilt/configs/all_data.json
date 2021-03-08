@@ -1,0 +1,65 @@
+{
+    "Fact Checking Test": {
+        "FEVER": "data/fever-test_without_answers-kilt.jsonl"
+    },
+    "Entity Linking Test": {
+        "AIDA-YAGO2": "data/aidayago2-test_without_answers-kilt.jsonl",
+        "WNED": "data/wned-test_without_answers-kilt.jsonl",
+        "CWEB": "data/cweb-test_without_answers-kilt.jsonl"
+    },
+    "Slot Filling Test": {
+        "Zero Shot RE": "data/structured_zeroshot-test_without_answers-kilt.jsonl",
+        "T-REx": "data/trex-test_without_answers-kilt.jsonl"
+    },
+    "Open Domain QA Test": {
+        "Natural Questions": "data/nq-test_without_answers-kilt.jsonl",
+        "HotpotQA": "data/hotpotqa-test_without_answers-kilt.jsonl",
+        "TriviaQA": "data/triviaqa-test_without_answers-kilt.jsonl",
+        "ELI5": "data/eli5-test_without_answers-kilt.jsonl"
+    },
+    "Dialogue Test Dev": {
+        "Wizard of Wikipedia": "data/wow-test_without_answers-kilt.jsonl"
+    },
+    "Fact Checking Dev": {
+        "FEVER": "data/fever-dev-kilt.jsonl"
+    },
+    "Entity Linking Dev": {
+        "AIDA-YAGO2": "data/aidayago2-dev-kilt.jsonl",
+        "WNED": "data/wned-dev-kilt.jsonl",
+        "CWEB": "data/cweb-dev-kilt.jsonl"
+    },
+    "Slot Filling Dev": {
+        "Zero Shot RE": "data/structured_zeroshot-dev-kilt.jsonl",
+        "T-REx": "data/trex-dev-kilt.jsonl"
+    },
+    "Open Domain QA Dev": {
+        "Natural Questions": "data/nq-dev-kilt.jsonl",
+        "HotpotQA": "data/hotpotqa-dev-kilt.jsonl",
+        "TriviaQA": "data/triviaqa-dev-kilt.jsonl",
+        "ELI5": "data/eli5-dev-kilt.jsonl"
+    },
+    "Dialogue Dev Train": {
+        "Wizard of Wikipedia": "data/wow-dev-kilt.jsonl"
+    },
+    "Entity Linking Train": {
+        "AIDA-YAGO2": "data/aidayago2-train-kilt.jsonl",
+        "WNED": "data/wned-train-kilt.jsonl",
+        "CWEB": "data/cweb-train-kilt.jsonl"
+    },
+    "Fact Checking Train": {
+        "FEVER": "data/fever-train-kilt.jsonl"
+    },
+    "Slot Filling Train": {
+        "Zero Shot RE": "data/structured_zeroshot-train-kilt.jsonl",
+        "T-REx": "data/trex-train-kilt.jsonl"
+    },
+    "Open Domain QA Train": {
+        "Natural Questions": "data/nq-train-kilt.jsonl",
+        "HotpotQA": "data/hotpotqa-train-kilt.jsonl",
+        "TriviaQA": "data/triviaqa-train-kilt.jsonl",
+        "ELI5": "data/eli5-train-kilt.jsonl"
+    },
+    "Dialogue Train": {
+        "Wizard of Wikipedia": "data/wow-train-kilt.jsonl"
+    }
+}
