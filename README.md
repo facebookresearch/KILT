@@ -150,6 +150,12 @@ We also provide a [script](scripts/map_TAC-KBP2010_to_KILT.py) to map the TAC-KB
 Please follow [this README](kilt/retrievers/README.md).
 
 
+## Mapping scripts
+
+Mapping scripts are located in `kilt/datasets/`.
+See `scripts/map_datasets.py` for an example.
+
+
 ## Troubleshooting
 
 If the module cannot be found, preface the python command with `PYTHONPATH=.`
