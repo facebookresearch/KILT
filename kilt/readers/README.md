@@ -3,7 +3,7 @@
 ### aidayago2
 ```
 python ../finetune.py \
-  --data_dir=/checkpoint/myazdani/kilt \
+  --data_dir=${DATA_DIR} \
   --dataset=${DATASET} \
   --model_name_or_path=t5-base \
   --learning_rate=1e-3 \
@@ -16,7 +16,7 @@ python ../finetune.py \
 ### eli5
 ```
 python ../finetune.py \
-  --data_dir=/checkpoint/myazdani/kilt \
+  --data_dir=${DATA_DIR} \
   --dataset=${DATASET} \
   --model_name_or_path=t5-base \
   --learning_rate=1e-3 \
@@ -29,7 +29,7 @@ python ../finetune.py \
 ### FEVER
 ```
 python ../finetune.py \
-  --data_dir=/checkpoint/myazdani/kilt \
+  --data_dir=${DATA_DIR} \
   --dataset=${DATASET} \
   --model_name_or_path=t5-base \
   --learning_rate=1e-3 \
@@ -42,7 +42,7 @@ python ../finetune.py \
 ### HotpotQA
 ```
 python ../finetune.py \
-  --data_dir=/checkpoint/myazdani/kilt \
+  --data_dir=${DATA_DIR} \
   --dataset=${DATASET} \
   --model_name_or_path=t5-base \
   --learning_rate=1e-3 \
@@ -55,7 +55,7 @@ python ../finetune.py \
 ### Natural Questions
 ```
 python ../finetune.py \
-  --data_dir=/checkpoint/myazdani/nqa \
+  --data_dir=${DATA_DIR} \
   --dataset=${DATASET} \
   --model_name_or_path=t5-base \
   --learning_rate=1e-3 \
@@ -68,7 +68,7 @@ python ../finetune.py \
 ### T-REx
 ```
 python ../finetune.py \
-  --data_dir=/checkpoint/myazdani/kilt \
+  --data_dir=${DATA_DIR} \
   --dataset=${DATASET} \
   --model_name_or_path=t5-base \
   --learning_rate=1e-3 \
@@ -81,7 +81,7 @@ python ../finetune.py \
 ### TriviaQA
 ```
 python ../finetune.py \
-  --data_dir=/checkpoint/myazdani/kilt \
+  --data_dir=${DATA_DIR} \
   --dataset=${DATASET} \
   --model_name_or_path=t5-base \
   --learning_rate=1e-3 \
@@ -94,7 +94,7 @@ python ../finetune.py \
 ### Wizard of Wikipedia
 ```
 python ../finetune.py \
-  --data_dir=/checkpoint/myazdani/kilt \
+  --data_dir=${DATA_DIR} \
   --dataset=${DATASET} \
   --model_name_or_path=t5-base \
   --learning_rate=1e-3 \
@@ -107,7 +107,7 @@ python ../finetune.py \
 ### Zeroshot RE
 ```
 python ../finetune.py \
-  --data_dir=/checkpoint/myazdani/kilt \
+  --data_dir=${DATA_DIR} \
   --dataset=${DATASET} \
   --model_name_or_path=t5-base \
   --learning_rate=1e-3 \
