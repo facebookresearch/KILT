@@ -14,9 +14,6 @@ from drqa import retriever
 import kilt.kilt_utils as utils
 from kilt.retrievers.base_retriever import Retriever
 
-ent_start_token = "[START_ENT]"
-ent_end_token = "[END_ENT]"
-
 
 def _get_predictions_thread(arguments):
 
@@ -39,8 +36,8 @@ def _get_predictions_thread(arguments):
 
         query = (
             query_element["query"]
-            .replace(ent_start_token, "")
-            .replace(ent_end_token, "")
+            .replace(utils.ENT_END, "")
+            .replace(utils.ENT_START, "")
             .strip()
         )
         result_query_id.append(query_element["id"])
@@ -75,29 +72,22 @@ class DrQA(Retriever):
                 }
             )
 
-    def fed_data(self, queries_data, topk, logger=None):
+    def fed_data(self, queries_data, logger=None):
 
         chunked_queries = utils.chunk_it(queries_data, self.num_threads)
 
         for idx, arg in enumerate(self.arguments):
             arg["queries_data"] = chunked_queries[idx]
-            arg["topk"] = topk
             arg["logger"] = logger
 
     def run(self):
         pool = ThreadPool(self.num_threads)
         results = pool.map(_get_predictions_thread, self.arguments)
 
-        all_doc_id = []
-        all_doc_scores = []
-        all_query_id = []
         provenance = {}
 
         for x in results:
             i, s, q = x
-            all_doc_id.extend(i)
-            all_doc_scores.extend(s)
-            all_query_id.extend(q)
             for query_id, doc_ids in zip(q, i):
                 provenance[query_id] = []
                 for d_id in doc_ids:
@@ -106,4 +96,4 @@ class DrQA(Retriever):
         pool.terminate()
         pool.join()
 
-        return all_doc_id, all_doc_scores, all_query_id, provenance
+        return provenance

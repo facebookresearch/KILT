@@ -9,17 +9,18 @@ import argparse
 import logging
 import pickle
 
+import blink.main_dense as main_dense
 from flair.models import SequenceTagger
 from flair.data import Sentence
-import blink.main_dense as main_dense
 
 from kilt.retrievers.base_retriever import Retriever
-
+import kilt.kilt_utils as utils
 
 class BLINK(Retriever):
     def __init__(self, name, **config):
         super().__init__(name)
 
+       
         self.args = argparse.Namespace(**config)
 
         self.logger = logging.getLogger("KILT")
@@ -35,9 +36,8 @@ class BLINK(Retriever):
     def fed_data(
         self,
         queries_data,
-        topk,
-        ent_start_token="[START_ENT]",
-        ent_end_token="[END_ENT]",
+        ent_start_token=utils.ENT_START,
+        ent_end_token=utils.ENT_END,
         logger=None,
     ):
         if logger:
@@ -127,15 +127,11 @@ class BLINK(Retriever):
             id_2_results[r["id"]]["predictions"].extend(p)
             id_2_results[r["id"]]["scores"].extend(s)
 
-        all_doc_id = []
-        all_query_id = []
-        all_scores = []
-
         provenance = {}
 
         for id, results in id_2_results.items():
 
-            element = {"id": str(id), "retrieved": []}
+            element = []
 
             # merge predictions when multiple entities are found
             sorted_titles = []
@@ -162,15 +158,13 @@ class BLINK(Retriever):
                     else:
                         page = self.ks.get_page_by_title(e_title)
                         self.cache_pages[e_title] = page
-                    
+
                     wikipedia_id = page["wikipedia_id"]
                     """
 
                     wikipedia_id = self.Wikipedia_title2id[e_title]
 
-                    local_doc_id.append(wikipedia_id)
-
-                    element["retrieved"].append(
+                    element.append(
                         {
                             "score": str(score),
                             # "text": page["text"],
@@ -178,9 +172,6 @@ class BLINK(Retriever):
                             "wikipedia_id": str(wikipedia_id),
                         }
                     )
-            all_doc_id.append(local_doc_id)
-            all_scores.append(sorted_scores)
-            all_query_id.append(id)
-            provenance[id] = element["retrieved"]
+            provenance[id] = element
 
-        return all_doc_id, all_scores, all_query_id, provenance
+        return provenance
