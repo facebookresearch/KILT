@@ -54,7 +54,7 @@ def run(
                     print("query_data: {}", format(query_data))
 
                 # get predictions
-                ranker.fed_data(query_data, topk)
+                ranker.feed_data(query_data, topk)
                 all_doc_id, all_doc_scores, all_query_id, provenance = ranker.run()
 
                 if len(all_query_id) != len(query_data):
