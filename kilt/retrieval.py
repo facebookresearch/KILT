@@ -54,13 +54,13 @@ def run(
                     print("query_data: {}", format(query_data))
 
                 # get predictions
-                ranker.fed_data(query_data, topk)
-                all_doc_id, all_doc_scores, all_query_id, provenance = ranker.run()
+                ranker.fed_data(query_data)
+                provenance = ranker.run()
 
-                if len(all_query_id) != len(query_data):
+                if len(provenance) != len(query_data):
                     logger.warning(
                         "different numbers of queries: {} and predicions: {}".format(
-                            len(query_data), len(all_query_id)
+                            len(query_data), len(provenance)
                         )
                     )
 
@@ -70,7 +70,7 @@ def run(
                     logger.info("writing prediction file to {}".format(output_file))
 
                     predictions = []
-                    for query_id in all_query_id:
+                    for query_id in provenance.keys():
                         element = validated_data[query_id]
                         element["output"] = [{"provenance": provenance[query_id]}]
                         predictions.append(element)

@@ -1,5 +1,24 @@
+# Scripts
 
-## Scripts
+## execute retrieval
+
+This script executes retrieval from a given model and store retrieved augmented KILT files
+
+options:
+* __--model_name/-m__ : retriever model name in {drqa,solr,dpr,blink,bm25}
+* __--model_configuration/-c__ : model configuration 
+* __--output_folder/-o__ : output folder
+
+
+example
+```
+python scripts/execute_retrieval.py -m dpr -c kilt/configs/retriever/default_dpr.json -o predictions/dpr/
+```
+
+To setup the retrievers see [kilt/readers/README.md](this README).
+
+
+## create kilt data paragraphs
 The script `scripts/create_kilt_data_paragraphs.py` create chunks of all wikipedia in the format:
 ```
 {'_id': str,

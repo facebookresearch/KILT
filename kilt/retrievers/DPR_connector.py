@@ -90,12 +90,11 @@ class DPR(Retriever):
         if self.args.KILT_mapping:
             self.KILT_mapping = pickle.load(open(self.args.KILT_mapping, "rb"))
 
-    def fed_data(
+    def feed_data(
         self,
         queries_data,
-        topk,
-        ent_start_token="[START_ENT]",
-        ent_end_token="[END_ENT]",
+        ent_start_token=utils.ENT_START,
+        ent_end_token=utils.ENT_START,
         logger=None,
     ):
 
@@ -113,29 +112,11 @@ class DPR(Retriever):
             questions_tensor.numpy(), self.args.n_docs
         )
 
-        # debug
-        # pickle.dump(
-        #     top_ids_and_scores,
-        #     open(
-        #         "/checkpoint/fabiopetroni/KILT/retriever/DPR/debug/top_ids_and_scores_{}.p".format(
-        #             self.query_ids[0]
-        #         ),
-        #         "wb",
-        #     ),
-        # )
-
         provenance = {}
 
-        all_doc_id = []
-        all_query_id = []
-        all_doc_scores = []
         for record, query_id in zip(top_ids_and_scores, self.query_ids):
             top_ids, scores = record
-
-            doc_id = []
-            doc_scores = []
-
-            element = {"id": str(query_id), "retrieved": []}
+            element = []
 
             # sort by score in descending order
             for score, id in sorted(zip(scores, top_ids), reverse=True):
@@ -153,11 +134,7 @@ class DPR(Retriever):
                     # passages indexed by wikipedia id
                     wikipedia_id = index
 
-                if wikipedia_id and wikipedia_id not in doc_id:
-                    doc_id.append(wikipedia_id)
-                    doc_scores.append(score)
-
-                element["retrieved"].append(
+                element.append(
                     {
                         "score": str(score),
                         "text": str(text),
@@ -167,10 +144,6 @@ class DPR(Retriever):
                 )
 
             assert query_id not in provenance
-            provenance[query_id] = element["retrieved"]
+            provenance[query_id] = element
 
-            all_doc_id.append(doc_id)
-            all_doc_scores.append(doc_scores)
-            all_query_id.append(query_id)
-
-        return all_doc_id, all_doc_scores, all_query_id, provenance
+        return provenance

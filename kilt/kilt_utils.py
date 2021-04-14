@@ -14,6 +14,8 @@ import time
 import string
 import random
 
+ENT_START = "[START_ENT]"
+ENT_END = "[END_ENT]"
 
 def normalize_answer(s):
     """Lower text and remove punctuation, articles and extra whitespace."""
