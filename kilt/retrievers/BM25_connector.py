@@ -72,7 +72,7 @@ class BM25(Retriever):
                 }
             )
 
-    def fed_data(self, queries_data, logger=None):
+    def feed_data(self, queries_data, logger=None):
 
         chunked_queries = utils.chunk_it(queries_data, self.num_threads)
 

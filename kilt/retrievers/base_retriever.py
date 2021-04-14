@@ -37,7 +37,7 @@ class Retriever(ABC):
         return cls(name, **config)
 
     @abstractmethod
-    def fed_data(self, queries_data, logger=None):
+    def feed_data(self, queries_data, logger=None):
         """
         fed all data to the retriever, that will take care of batchify it
         each element in queries_data has an id and a query

@@ -33,7 +33,7 @@ class BLINK(Retriever):
 
         self.Wikipedia_title2id = pickle.load(open(self.args.wikipedia_title2id, "rb"))
 
-    def fed_data(
+    def feed_data(
         self,
         queries_data,
         ent_start_token=utils.ENT_START,

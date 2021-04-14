@@ -90,7 +90,7 @@ class DPR(Retriever):
         if self.args.KILT_mapping:
             self.KILT_mapping = pickle.load(open(self.args.KILT_mapping, "rb"))
 
-    def fed_data(
+    def feed_data(
         self,
         queries_data,
         ent_start_token=utils.ENT_START,
