@@ -54,6 +54,16 @@ def main(args):
             )
         else:
             retriever = DPR_connector.DPR.from_default_config(args.model_name)
+    elif args.model_name == "dpr_distr":
+        # DPR distributed
+        from kilt_internal.retrievers import DPR_distr_connector
+
+        if args.model_configuration:
+            retriever = DPR_distr_connector.DPR.from_config_file(
+                args.model_name, args.model_configuration
+            )
+        else:
+            raise "No default configuration for DPR distributed!"
     elif args.model_name == "blink":
         # BLINK
         from kilt.retrievers import BLINK_connector
