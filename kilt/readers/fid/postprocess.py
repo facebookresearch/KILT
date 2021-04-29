@@ -22,26 +22,13 @@ def convert_to_kilt(inputpath, outputpath, datapath):
             if id in d:
                 print('key already in dict', d[id], answer)
             d['id'] = id
-            #import pdb
-            #pdb.set_trace()
-            #wikipedia_ids = [
-            #    {'wikipedia_id': p['wikipedia_id']} for p in datadict[str(id)]['output'][0]['provenance']
-            #]
-            #output = [{
-            #    'answer': answer,
-            #    'provenance': wikipedia_ids
-            #}]
 
             wikipedia_ids = [
                 {'wikipedia_id': p['wikipedia_id']} for p in datadict[str(id)]['output'][0]['provenance']
             ]
-            #wikipedia_ids = []
             wikipedia_ids = [{
                 'answer': answer,
-                #'provenance': wikipedia_ids,
             }]
-            #output = datadict[str(id)]['output'].append({'answer':answer})
-            #output = [{'answer':answer}]
             d['output'] = wikipedia_ids
 
             json.dump(d, outfile)
