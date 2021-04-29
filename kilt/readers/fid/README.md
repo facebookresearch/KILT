@@ -13,7 +13,7 @@ python preprocess.py input_data.jsonl outputpath
 ### Train FiD
 
 ```shell
-python train_reader.py \
+python src/fid/train_reader.py \
         --use_checkpoint \
         --train_data train_data.json \
         --eval_data eval_data.json \
@@ -27,7 +27,7 @@ python train_reader.py \
 ### Eval FiD
 
 ```shell
-python test_reader.py \
+python src/fid/test_reader.py \
         --model_path checkpoint/my_experiment/checkpoint/best_dev \
         --eval_data eval_data.json \
         --per_gpu_batch_size 1 \
