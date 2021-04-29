@@ -23,13 +23,7 @@ def convert_to_kilt(inputpath, outputpath, datapath):
                 print('key already in dict', d[id], answer)
             d['id'] = id
 
-            wikipedia_ids = [
-                {'wikipedia_id': p['wikipedia_id']} for p in datadict[str(id)]['output'][0]['provenance']
-            ]
-            wikipedia_ids = [{
-                'answer': answer,
-            }]
-            d['output'] = wikipedia_ids
+            d['output'] = [{'answer': answer}]
 
             json.dump(d, outfile)
             outfile.write('\n')
