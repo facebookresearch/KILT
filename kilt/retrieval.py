@@ -72,7 +72,12 @@ def run(
                     predictions = []
                     for query_id in provenance.keys():
                         element = validated_data[query_id]
-                        element["output"] = [{"provenance": provenance[query_id]}]
+                        new_output = [{"provenance": provenance[query_id]}]
+                        # append the answers
+                        for o in element["output"]:
+                            if "answer" in o:
+                                new_output.append({"answer": o["answer"]})
+                        element["output"] = new_output
                         predictions.append(element)
 
                     with open(output_file, "w+") as outfile:
