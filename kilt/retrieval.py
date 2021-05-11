@@ -7,6 +7,8 @@
 
 import json
 import os
+import os.path
+from os import path
 
 from kilt import kilt_utils as utils
 
@@ -31,9 +33,19 @@ def run(
 
     for task_family, datasets in test_config_json.items():
         logger.info("TASK: {}".format(task_family))
+
         for dataset_name, dataset_file in datasets.items():
             logger.info("DATASET: {}".format(dataset_name))
+
             if dataset_file:
+
+                output_file = generate_output_file(output_folder, dataset_file)
+                if path.exists(output_file):
+                    logger.info(
+                        "Skip output file {} that already exists.".format(output_file)
+                    )
+                    continue
+
                 raw_data = utils.load_data(dataset_file)
 
                 # consider only valid data - filter out invalid
@@ -66,7 +78,6 @@ def run(
 
                 # write prediction files
                 if provenance:
-                    output_file = generate_output_file(output_folder, dataset_file)
                     logger.info("writing prediction file to {}".format(output_file))
 
                     predictions = []

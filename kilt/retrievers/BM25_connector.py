@@ -7,9 +7,10 @@
 
 import multiprocessing
 from multiprocessing.pool import ThreadPool
+import json
 
 from tqdm import tqdm
-from pyserini.search import SimpleSearcher
+import jnius_config
 
 import kilt.kilt_utils as utils
 from kilt.retrievers.base_retriever import Retriever
@@ -25,6 +26,8 @@ def _run_thread(arguments):
     # bm25_a = arguments["bm25_a"]
     # bm25_b = arguments["bm25_b"]
     # searcher.set_bm25(bm25_a, bm25_b)
+
+    from pyserini.search import SimpleSearcher
 
     searcher = SimpleSearcher(index)
 
@@ -56,8 +59,15 @@ def _run_thread(arguments):
 
 
 class BM25(Retriever):
-    def __init__(self, name, index, k, num_threads):
+    def __init__(self, name, index, k, num_threads, Xms=None, Xmx=None):
         super().__init__(name)
+
+        if Xms and Xmx:
+            # to solve Insufficient memory for the Java Runtime Environment
+            jnius_config.add_options(
+                "-Xms{}".format(Xms), "-Xmx{}".format(Xmx), "-XX:-UseGCOverheadLimit"
+            )
+            print("Configured options:", jnius_config.get_options())
 
         self.num_threads = min(num_threads, int(multiprocessing.cpu_count()))
 
