@@ -300,6 +300,20 @@ def compute(gold_dataset, guess_dataset, ks, rank_keys):
 
     return result
 
+def filter_answers(guess):
+    new_guess = []
+    for x in guess:
+        new_o = []
+        for o in x["output"]:
+            if "provenance" in o:
+                new_o.append(o)
+        assert (
+            len(new_o) == 1
+        ), f"guess should provide exactly one output with provenance for {x['id']}"
+        x["output"] = new_o
+        new_guess.append(x)
+    return new_guess
+
 
 def evaluate(gold, guess, ks, rank_keys):
     pp = pprint.PrettyPrinter(indent=4)
@@ -312,7 +326,10 @@ def evaluate(gold, guess, ks, rank_keys):
         gold_dataset, guess_dataset
     )
 
-    # 1. get retrieval metrics
+    # 1. filter out ground thruth answers
+    guess_dataset = filter_answers(guess_dataset)
+
+    # 2. get retrieval metrics
     result = compute(gold_dataset, guess_dataset, ks, rank_keys)
 
     pp.pprint(result)
