@@ -85,9 +85,10 @@ def run(
                         element = validated_data[query_id]
                         new_output = [{"provenance": provenance[query_id]}]
                         # append the answers
-                        for o in element["output"]:
-                            if "answer" in o:
-                                new_output.append({"answer": o["answer"]})
+                        if "output" in element:
+                            for o in element["output"]:
+                                if "answer" in o:
+                                    new_output.append({"answer": o["answer"]})
                         element["output"] = new_output
                         predictions.append(element)
 
