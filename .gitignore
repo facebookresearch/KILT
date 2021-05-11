@@ -7,6 +7,8 @@ predictions
 models 
 NHKB/
 kilt_internal/
+checkpoint/
+fid_data/
 
 text_utils.py
 
