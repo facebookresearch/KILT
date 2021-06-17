@@ -239,7 +239,7 @@ def evaluate(gold, guess):
     result = _calculate_metrics(gold_records, guess_records)
 
     # 2. retrieval performance
-    retrieval_results = retrieval_metrics.compute(
+    retrieval_results = retrieval_metrics.get_ranking_metrics(
         gold_records, guess_records, ks=[1, 5], rank_keys=["wikipedia_id"]
     )
     result["retrieval"] = {

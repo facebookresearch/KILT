@@ -51,7 +51,7 @@ def _get_ids_list(datapoint, rank_keys, verbose=False):
     return ids_list
 
 
-def get_rank(guess_item, gold_item, k, rank_keys, verbose=False):
+def compute_rank_for_item(guess_item, gold_item, k, rank_keys, verbose=False):
     """
     The main idea is to consider each evidence set as a single point in the rank.
     The score in the rank for an evidence set is given by the lowest scored evidence in the set.
@@ -207,7 +207,7 @@ def rprecision(guess_item, gold_item, rank_keys):
     return max(Rprec_vector)
 
 
-def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
+def get_ranking_metrics_for_item(guess_item, gold_item, ks, rank_keys, compute_rank_func):
 
     Rprec = 0
     P_at_k = {"precision@{}".format(k): 0 for k in sorted(ks) if k > 0}
@@ -223,7 +223,7 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
     for k in ks:
 
         # 0. get rank
-        rank, num_distinct_evidence_sets = get_rank(
+        rank, num_distinct_evidence_sets = compute_rank_func(
             guess_item, gold_item, k, rank_keys=rank_keys
         )
 
@@ -248,7 +248,7 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
     return {"Rprec": Rprec, **P_at_k, **R_at_k, **S_at_k, **A_at_k}
 
 
-def compute(gold_dataset, guess_dataset, ks, rank_keys):
+def get_ranking_metrics(gold_dataset, guess_dataset, ks, rank_keys, compute_rank_func):
 
     ks = sorted([int(x) for x in ks])
 
@@ -272,7 +272,7 @@ def compute(gold_dataset, guess_dataset, ks, rank_keys):
         ), "Items must have same order with same IDs"
 
     for guess_item, gold_item in zip(guess_dataset, gold_dataset):
-        ranking_metrics = get_ranking_metrics(guess_item, gold_item, ks, rank_keys)
+        ranking_metrics = get_ranking_metrics_for_item(guess_item, gold_item, ks, rank_keys, compute_rank_func)
         result["Rprec"] += ranking_metrics["Rprec"]
         for k in ks:
             if k > 0:
@@ -315,7 +315,7 @@ def filter_answers(guess):
     return new_guess
 
 
-def evaluate(gold, guess, ks, rank_keys):
+def evaluate(gold, guess, ks, rank_keys, compute_rank_for_item_func):
     pp = pprint.PrettyPrinter(indent=4)
 
     gold_dataset = kilt_utils.load_data(gold)
@@ -330,7 +330,7 @@ def evaluate(gold, guess, ks, rank_keys):
     guess_dataset = filter_answers(guess_dataset)
 
     # 2. get retrieval metrics
-    result = compute(gold_dataset, guess_dataset, ks, rank_keys)
+    result = get_ranking_metrics(gold_dataset, guess_dataset, ks, rank_keys, compute_rank_func=compute_rank_for_item_func)
 
     pp.pprint(result)
     return result
@@ -359,4 +359,4 @@ if __name__ == "__main__":
     args.ks = [int(k) for k in args.ks.split(",")]
     args.rank_keys = [rank_key for rank_key in args.rank_keys.split(",")]
 
-    evaluate(args.gold, args.guess, args.ks, args.rank_keys)
+    evaluate(args.gold, args.guess, args.ks, args.rank_keys, compute_rank_for_item_func=compute_rank_for_item)
