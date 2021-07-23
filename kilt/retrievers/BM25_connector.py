@@ -46,13 +46,20 @@ def _run_thread(arguments):
 
         element = []
         for y in hits:
-            element.append(
-                {
-                    "score": y.score,
-                    "text": str(y.raw).strip(),
-                    "title": y.docid,
-                }
-            )
+            try:
+                doc_data = json.loads(str(y.docid).strip())
+                doc_data["score"] = y.score
+                doc_data["text"] = str(y.raw).strip()
+                element.append(doc_data)
+            except Exception as e:
+                print(e)
+                element.append(
+                    {
+                        "score": y.score,
+                        "text": str(y.raw).strip(),
+                        "title": y.docid,
+                    }
+                )
         provenance[query_id] = element
 
     return provenance
