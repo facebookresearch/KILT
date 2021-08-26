@@ -9,11 +9,24 @@
 The KILT benchmark is described in the following paper:
 
 ```bibtex
-@inproceedings{petroni2020kilt,
- title={KILT: a Benchmark for Knowledge Intensive Language Tasks},
- author={Fabio Petroni and Aleksandra Piktus and Angela Fan and Patrick Lewis and Majid Yazdani and Nicola De Cao and James Thorne and Yacine Jernite and Vassilis Plachouras and Tim Rockt{\"{a}}schel and Sebastian Riedel},
- booktitle={arXiv:2009.02252},
- year={2020}
+@inproceedings{petroni-etal-2021-kilt,
+    title = "{KILT}: a Benchmark for Knowledge Intensive Language Tasks",
+    author = {Petroni, Fabio  and Piktus, Aleksandra  and
+      Fan, Angela  and Lewis, Patrick  and
+      Yazdani, Majid  and De Cao, Nicola  and
+      Thorne, James  and Jernite, Yacine  and
+      Karpukhin, Vladimir  and Maillard, Jean  and
+      Plachouras, Vassilis  and Rockt{\"a}schel, Tim  and
+      Riedel, Sebastian},
+    booktitle = "Proceedings of the 2021 Conference of the North American Chapter of the Association 
+                 for Computational Linguistics: Human Language Technologies",
+    month = jun,
+    year = "2021",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.naacl-main.200",
+    doi = "10.18653/v1/2021.naacl-main.200",
+    pages = "2523--2544",
 }
 ```
 
