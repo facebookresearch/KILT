@@ -24,6 +24,15 @@ def get_gold_answers(gold):
             ground_truths.add(item["answer"].strip())
     return ground_truths
 
+# utility to get gold titles
+def get_gold_titles(gold):
+    titles = set()
+    for item in gold["output"]:
+        if "provenance" in item:
+            for provenance in item["provenance"]:
+                if "title" in provenance and provenance["title"] and len(provenance["title"].strip()) > 0:
+                    titles.add(provenance["title"].strip())
+    return titles
 
 # utility to get max
 def _metric_max_over_ground_truths(metric_fn, prediction, ground_truths):

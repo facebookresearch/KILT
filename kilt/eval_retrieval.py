@@ -182,6 +182,121 @@ def _answer_in_context_at_k(guess_item, gold_item, k):
                         return 1
     return 0
 
+def _answer_and_ent_in_context_at_k(guess_item, gold_item, k):
+
+    answers = eval_downstream.get_gold_answers(gold_item)
+    titles = eval_downstream.get_gold_titles(gold_item)
+
+    if "provenance" in guess_item["output"][0]:
+        provenance = guess_item["output"][0]["provenance"]
+        for i in range(0, min(k, len(provenance))):
+            if "text" in provenance[i]:
+                normalized_text = eval_downstream.normalize_answer(
+                    provenance[i]["text"]
+                )
+                has_answer = False
+                for a in answers:
+                    if eval_downstream.normalize_answer(a) in normalized_text:
+                        has_answer = True
+                        break
+                if has_answer:
+                    for t in titles:
+                        if eval_downstream.normalize_answer(t) in normalized_text:
+                            return 1
+                
+    return 0
+
+
+def title_in_input(gold_item):
+
+    input = eval_downstream.normalize_answer(gold_item["input"])
+    titles = eval_downstream.get_gold_titles(gold_item)
+
+    for t in titles:
+        if eval_downstream.normalize_answer(t) in input:
+            return 1
+    return 0
+
+
+def _answer_redundancy_at_k(guess_item, gold_item, k):
+
+    answers = eval_downstream.get_gold_answers(gold_item)
+
+    if "provenance" in guess_item["output"][0]:
+        provenance = guess_item["output"][0]["provenance"]
+        count_answers = 0
+        for i in range(0, min(k, len(provenance))):
+            if "text" in provenance[i]:
+                normalized_text = eval_downstream.normalize_answer(
+                    provenance[i]["text"]
+                )
+                for a in answers:
+                    if eval_downstream.normalize_answer(a) in normalized_text:
+                        count_answers += 1
+                        break
+        return count_answers / k
+    return 0
+
+def _docs_with_answer_at_k(guess_item, gold_item, k):
+
+    answers = eval_downstream.get_gold_answers(gold_item)
+
+    if "provenance" in guess_item["output"][0]:
+        provenance = guess_item["output"][0]["provenance"]
+        docs_with_answer = set()
+        for i in range(0, min(k, len(provenance))):
+            if "text" in provenance[i]:
+                normalized_text = eval_downstream.normalize_answer(
+                    provenance[i]["text"]
+                )
+                if "url" not in provenance[i]:
+                    # print("NO URL", provenance[i])
+                    continue
+                for a in answers:
+                    if eval_downstream.normalize_answer(a) in normalized_text:
+                        docs_with_answer.add(provenance[i]["url"])
+                        break
+        return len(docs_with_answer) / k
+    return 0
+
+# 4. Answer in doc computation
+def _answer_in_doc_at_k(guess_dataset, gold_dataset, k):
+    for guess_item, gold_item in zip(guess_dataset, gold_dataset):
+        answers = eval_downstream.get_gold_answers(gold_item)
+        if "provenance" in guess_item["output"][0]:
+            provenance = guess_item["output"][0]["provenance"]
+            docs_with_answer = set()
+            for i in range(0, min(k, len(provenance))):
+                if "text" in provenance[i]:
+                    normalized_text = eval_downstream.normalize_answer(
+                        provenance[i]["text"]
+                    )
+                    if "url" not in provenance[i]:
+                        # print("NO URL", provenance[i])
+                        continue
+                    for a in answers:
+                        if eval_downstream.normalize_answer(a) in normalized_text:
+                            docs_with_answer.add(provenance[i]["url"])
+    return len(docs_with_answer) / k
+
+
+def _answer_in_title_at_k(guess_item, gold_item, k):
+
+    answers = eval_downstream.get_gold_answers(gold_item)
+
+    if "provenance" in guess_item["output"][0]:
+        provenance = guess_item["output"][0]["provenance"]
+        for i in range(0, min(k, len(provenance))):
+            if "text" in provenance[i]:
+                title_col = "title" if "title" in provenance[i] else "wikipedia_title"
+                normalized_text = eval_downstream.normalize_answer(
+                    provenance[i][title_col]
+                )
+                for a in answers:
+                    if eval_downstream.normalize_answer(a) in normalized_text:
+                        return 1
+    return 0
+
 
 def _computeRprec(guess_ids, gold_ids):
 
@@ -209,17 +324,23 @@ def rprecision(guess_item, gold_item, rank_keys):
 
 def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
 
-    Rprec = 0
+    Rprec = 0.0
+    TI_at_k = 0.0
     P_at_k = {"precision@{}".format(k): 0 for k in sorted(ks) if k > 0}
     R_at_k = {"recall@{}".format(k): 0 for k in sorted(ks) if k > 1}
     S_at_k = {"success_rate@{}".format(k): 0 for k in sorted(ks) if k > 1}
     A_at_k = {"answer_in_context@{}".format(k): 0 for k in sorted(ks) if k > 0}
+    At_at_k= {"answer_in_title@{}".format(k): 0 for k in sorted(ks) if k > 0}
+    Red_at_k = {"answer_redundancy@{}".format(k): 0 for k in sorted(ks) if k > 0}
+    Doc_at_k = {"docs_with_answer@{}".format(k): 0 for k in sorted(ks) if k > 0}
+    AE_at_k = {"answer_and_ent_in_context@{}".format(k): 0 for k in sorted(ks) if k > 0}
 
     assert (
         "output" in guess_item and len(guess_item["output"]) == 1
     ), f"guess should provide exactly one output for {guess_item['id']}"
 
     Rprec = rprecision(guess_item, gold_item, rank_keys=rank_keys)
+    tii = title_in_input(gold_item)
     for k in ks:
 
         # 0. get rank
@@ -245,7 +366,23 @@ def get_ranking_metrics(guess_item, gold_item, ks, rank_keys):
             guess_item, gold_item, k
         )
 
-    return {"Rprec": Rprec, **P_at_k, **R_at_k, **S_at_k, **A_at_k}
+        At_at_k["answer_in_title@{}".format(k)] = _answer_in_title_at_k(
+            guess_item, gold_item, k
+        )
+
+        Red_at_k["answer_redundancy@{}".format(k)] = _answer_redundancy_at_k(
+            guess_item, gold_item, k
+        )
+
+        Doc_at_k["docs_with_answer@{}".format(k)] = _docs_with_answer_at_k(
+            guess_item, gold_item, k
+        )
+
+        AE_at_k["answer_and_ent_in_context@{}".format(k)] = _answer_and_ent_in_context_at_k(
+            guess_item, gold_item, k
+        )
+
+    return {"Rprec": Rprec, **P_at_k, **R_at_k, **S_at_k, **A_at_k, **At_at_k, **Red_at_k, **Doc_at_k, **AE_at_k, "title_in_input": tii}
 
 
 def compute(gold_dataset, guess_dataset, ks, rank_keys):
@@ -254,13 +391,21 @@ def compute(gold_dataset, guess_dataset, ks, rank_keys):
 
     result = OrderedDict()
     result["Rprec"] = 0.0
+    result["title_in_input"] = 0.0
     for k in ks:
         if k > 0:
             result["precision@{}".format(k)] = 0.0
             result["answer_in_context@{}".format(k)] = 0.0
+            result["answer_in_title@{}".format(k)] = 0.0
+            result["answer_redundancy@{}".format(k)] = 0.0
+            result["docs_with_answer@{}".format(k)] = 0.0
+            result["answer_and_ent_in_context@{}".format(k)] = 0.0
         if k > 1:
             result["recall@{}".format(k)] = 0.0
             result["success_rate@{}".format(k)] = 0.0
+
+        # result["answer_in_doc@{}".format(k)] = _answer_in_doc_at_k(guess_dataset, gold_dataset, k)
+
 
     assert len(guess_dataset) == len(
         gold_dataset
@@ -274,6 +419,7 @@ def compute(gold_dataset, guess_dataset, ks, rank_keys):
     for guess_item, gold_item in zip(guess_dataset, gold_dataset):
         ranking_metrics = get_ranking_metrics(guess_item, gold_item, ks, rank_keys)
         result["Rprec"] += ranking_metrics["Rprec"]
+        result["title_in_input"]  += ranking_metrics["title_in_input"]
         for k in ks:
             if k > 0:
                 result["precision@{}".format(k)] += ranking_metrics[
@@ -282,18 +428,36 @@ def compute(gold_dataset, guess_dataset, ks, rank_keys):
                 result["answer_in_context@{}".format(k)] += ranking_metrics[
                     "answer_in_context@{}".format(k)
                 ]
+                result["answer_in_title@{}".format(k)]  += ranking_metrics[
+                    "answer_in_title@{}".format(k)
+                ]
+                result["answer_redundancy@{}".format(k)]  += ranking_metrics[
+                    "answer_redundancy@{}".format(k)
+                ]
+                result["docs_with_answer@{}".format(k)]  += ranking_metrics[
+                    "docs_with_answer@{}".format(k)
+                ]
+                result["answer_and_ent_in_context@{}".format(k)]  += ranking_metrics[
+                    "answer_and_ent_in_context@{}".format(k)
+                ]
             if k > 1:
                 result["recall@{}".format(k)] += ranking_metrics["recall@{}".format(k)]
                 result["success_rate@{}".format(k)] += ranking_metrics[
                     "success_rate@{}".format(k)
                 ]
 
+
     if len(guess_dataset) > 0:
         result["Rprec"] /= len(guess_dataset)
+        result["title_in_input"] /= len(guess_dataset)
         for k in ks:
             if k > 0:
                 result["precision@{}".format(k)] /= len(guess_dataset)
                 result["answer_in_context@{}".format(k)] /= len(guess_dataset)
+                result["answer_in_title@{}".format(k)] /= len(guess_dataset)
+                result["answer_redundancy@{}".format(k)] /= len(guess_dataset)
+                result["docs_with_answer@{}".format(k)] /= len(guess_dataset)
+                result["answer_and_ent_in_context@{}".format(k)] /= len(guess_dataset)
             if k > 1:
                 result["recall@{}".format(k)] /= len(guess_dataset)
                 result["success_rate@{}".format(k)] /= len(guess_dataset)
