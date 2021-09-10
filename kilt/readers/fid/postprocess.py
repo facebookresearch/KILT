@@ -30,7 +30,7 @@ def convert_to_kilt(inputpath, outputpath, datapath):
             if id in d:
                 print('key already in dict', d[id], answer)
             d['id'] = id
-            d['input'] = datadict[id]
+
             d['output'] = [{'answer': answer}]
 
             json.dump(d, outfile)
