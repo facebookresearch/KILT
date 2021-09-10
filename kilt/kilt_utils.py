@@ -71,7 +71,9 @@ def validate_datapoint(datapoint, logger):
             if "provenance" in output:
                 for provenance in output["provenance"]:
                     # wikipedia_id is provided
-                    if not isinstance(provenance["wikipedia_id"], str):
+                    if provenance["wikipedia_id"] is not None and not isinstance(
+                        provenance["wikipedia_id"], str
+                    ):
                         if logger:
                             logger.warning(
                                 "[{}] wikipedia_id is not a string {}".format(
