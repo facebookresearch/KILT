@@ -84,7 +84,7 @@ class KnowledgeSource:
         return cursor
 
     def get_num_pages(self):
-        return self.db.count()
+        return self.db.estimated_document_count()
 
     def get_page_by_id(self, wikipedia_id):
         page = self.db.find_one({"_id": str(wikipedia_id)})
