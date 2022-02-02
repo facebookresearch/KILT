@@ -52,13 +52,13 @@ def run(
                 validated_data = {}
                 query_data = []
                 for element in raw_data:
-                    if utils.validate_datapoint(element, logger=None):
-                        if element["id"] in validated_data:
-                            raise ValueError("ids are not unique in input data!")
-                        validated_data[element["id"]] = element
-                        query_data.append(
-                            {"query": element["input"], "id": element["id"]}
-                        )
+                    #if utils.validate_datapoint(element, logger=None):
+                    if element["id"] in validated_data:
+                        raise ValueError("ids are not unique in input data!")
+                    validated_data[element["id"]] = element
+                    query_data.append(
+                        {"query": element["input"], "id": element["id"]}
+                    )
 
                 if debug:
                     # just consider the top10 datapoints
