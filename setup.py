@@ -23,4 +23,17 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.7",
+    install_requires=[
+        "bs4",
+        "flair",
+        "jsonlines",
+        "nltk",
+        "prettytable",
+        "pymongo",
+        "pytest",
+        "rouge",
+        "spacy>=2.1.8",
+        "torch",
+        "tqdm",
+    ],
 )
