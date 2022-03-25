@@ -37,7 +37,7 @@ The KILT benchmark is described in the following paper:
 
 ```bash
 conda create -n kilt37 -y python=3.7 && conda activate kilt37
-pip install -r requirements.txt
+pip install -e .
 ```
 
 ## KILT knowledge source

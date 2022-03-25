@@ -43,6 +43,7 @@ python scripts/execute_retrieval.py -m dpr -o predictions/dpr
 ## install
 ```bash
 pip install -e git+https://github.com/facebookresearch/BLINK.git#egg=BLINK
+pip install flair
 ```
 
 ## download models
