@@ -38,6 +38,10 @@ Download the following files in the `models` folder.
 python scripts/execute_retrieval.py -m dpr -o predictions/dpr
 ```
 
+# DPR distributed
+
+Please follow instructions in the [Sphere](https://github.com/facebookresearch/Sphere) repository.
+
 # BLINK
 
 ## install
