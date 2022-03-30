@@ -63,7 +63,7 @@ python scripts/execute_retrieval.py -m blink -o predictions/blink
 ```
 
 # BM25
-Follow instruction in [`pyserini`](https://github.com/castorini/pyserini#installation) to download JAVA.
+Follow instructions in [`pyserini`](https://github.com/castorini/pyserini#installation) to download JAVA.
 ## install
 ```bash
 pip install jnius
