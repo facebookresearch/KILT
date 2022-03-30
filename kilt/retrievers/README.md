@@ -61,3 +61,16 @@ And this file:
 ```bash
 python scripts/execute_retrieval.py -m blink -o predictions/blink
 ```
+
+# BM25
+Follow instruction in [`pyserini`](https://github.com/castorini/pyserini#installation) to download JAVA.
+## install
+```bash
+pip install jnius
+pip install pyserini==0.9.4.0
+```
+
+## run
+```bash
+python scripts/execute_retrieval.py -m bm25 -o predictions/bm25
+```
